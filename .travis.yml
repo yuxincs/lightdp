@@ -1,10 +1,27 @@
+sudo: false
+
 language: python
 
 python:
   - "2.7"
+  - "3.2"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+  - "3.7"
+  - "pypy3"
   - "nightly"
 
 install:
-  - pip3 install -r requirements.txt
-  
-script: py.test
+  - pip install tox
+
+cache: pip
+
+script: tox
+
+after_success:
+  pip install python-coveralls && coveralls
+
+notification:
+  email: false
