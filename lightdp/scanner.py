@@ -1,5 +1,5 @@
 import ply.lex as lex
-lexer = lex.lex()
+#lexer = lex.lex()
 
 
 class Scanner:
@@ -12,5 +12,7 @@ class Scanner:
         return lexer.__iter__()
 
     def scan(self, s):
-        lexer.input(s)
+        pass
+        #print(s)
+        # lexer.input(s)
 
