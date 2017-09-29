@@ -22,11 +22,11 @@ install:
 script:
   - tox
 
-jobs:
-  include:
-    - stage: coveralls
-      python: nightly
-      script: pip install python-coveralls && coveralls
+#jobs:
+  #include:
+    #- stage: coveralls
+      #python: nightly
+      #script: pip install python-coveralls && coveralls
 
 notifications:
   email: false
