@@ -2,10 +2,6 @@ sudo: false
 
 language: python
 
-env:
-  global:
-    - NEWST_PYTHON=nightly
-
 python:
   - "2.7"
   - "3.3"
@@ -26,11 +22,11 @@ install:
 script:
   - tox
 
-after_success:
-  - |
-    if [[ $TRAVIS_PYTHON_VERSION == $NEWEST_PYTHON && $TRAVIS_OS_NAME == 'linux' ]]; then
-      pip install python-coveralls && coveralls
-    fi
+jobs:
+  include:
+    - stage: coveralls
+      python: nightly
+      script: pip install python-coveralls && coveralls
 
 notifications:
   email: false
