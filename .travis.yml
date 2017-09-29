@@ -4,7 +4,7 @@ language: python
 
 env:
   global:
-    - NEWST_PYTHON=3.7
+    - NEWST_PYTHON=nightly
 
 python:
   - "2.7"
@@ -12,7 +12,6 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
-  - "3.7"
   - "pypy3"
   - "nightly"
 
@@ -21,7 +20,11 @@ install:
 
 cache: pip
 
-script: tox -e $(echo py$TRAVIS_PYTHON_VERSION | tr -d . | sed -e 's/pypypy/pypy/')
+install:
+  - pip install tox-travis
+
+script:
+  - tox
 
 after_success:
   - |
