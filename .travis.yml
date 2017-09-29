@@ -29,5 +29,5 @@ after_success:
       pip install python-coveralls && coveralls
     fi
 
-notification:
+notifications:
   email: false
