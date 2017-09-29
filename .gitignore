@@ -6,7 +6,7 @@
 .DS_STORE
 *.tmp
 *.log
-.coverage.*
+.coverage
 .idea/
 .cache/
 build/
