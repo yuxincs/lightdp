@@ -1,4 +1,4 @@
-from lightdp import Scanner
+from lightdp.scanner import Scanner
 
 
 def test_parser():

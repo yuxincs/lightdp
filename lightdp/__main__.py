@@ -1,4 +1,5 @@
-from lightdp import Scanner, Parser
+from lightdp.scanner import Scanner
+from lightdp.parser import Parser
 
 
 def main():
