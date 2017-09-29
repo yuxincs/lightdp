@@ -2,6 +2,10 @@ sudo: false
 
 language: python
 
+env:
+  global:
+    - NEWST_PYTHON=3.7
+
 python:
   - "2.7"
   - "3.2"
@@ -18,10 +22,13 @@ install:
 
 cache: pip
 
-script: tox
+script: tox -e $(echo py$TRAVIS_PYTHON_VERSION | tr -d . | sed -e 's/pypypy/pypy/')
 
 after_success:
-  pip install python-coveralls && coveralls
+  - |
+    if [[ $TRAVIS_PYTHON_VERSION == $NEWEST_PYTHON && $TRAVIS_OS_NAME == 'linux' ]]; then
+      pip install python-coveralls && coveralls
+    fi
 
 notification:
   email: false
