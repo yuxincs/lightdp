@@ -14,7 +14,7 @@ python:
   - "nightly"
 
 install:
-  - pip install tox
+  - pip install -r requirements-dev.txt
 
 cache: pip
 
