@@ -34,9 +34,8 @@ setup(
     keywords='Programming Language, Differential Privacy',
     packages=find_packages(exclude=['tests']),
     install_requires=['ply'],
-    extras_require={
-        'dev': [],
-        'test': ['pytest', 'coverage'],
+    extras_requires={
+        'test': ['pytest-cov', 'pytest', 'coverage'],
     },
     entry_points={
         'console_scripts': [
