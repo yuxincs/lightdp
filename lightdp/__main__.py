@@ -1,5 +1,5 @@
-from lightdp.scanner import Scanner
-from lightdp.parser import Parser
+from lightdp.scanner import build_lexer
+from lightdp.parser import build_parser
 
 
 def main():

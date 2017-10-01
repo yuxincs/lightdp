@@ -1,6 +1,6 @@
-class Parser:
-    def __init__(self):
-        pass
-
-    def parse(self, s):
-        import ply.yacc as yacc
+def build_parser():
+    """
+    Build a ply.parser for parsing LightDP
+    :return: ply parser
+    """
+    import ply.yacc as yacc
