@@ -40,10 +40,10 @@ def test_illegal_character():
     with pytest.raises(SyntaxError) as error:
         lexer.input('a ~= 1;')
         tokens = [t for t in lexer]
-    assert error.value.message.type == 'error'
-    assert error.value.message.lineno == 1
-    assert error.value.message.value == '~= 1;'
-    assert error.value.message.lexpos == 2
+    assert error.value.msg.type == 'error'
+    assert error.value.msg.lineno == 1
+    assert error.value.msg.value == '~= 1;'
+    assert error.value.msg.lexpos == 2
 
 
 def test_comment():
