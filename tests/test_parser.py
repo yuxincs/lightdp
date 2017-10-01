@@ -1,5 +1,5 @@
-from lightdp.parser import Parser
+from lightdp.parser import build_parser
 
 
 def test_parser():
-    parser = Parser()
+    parser = build_parser()
