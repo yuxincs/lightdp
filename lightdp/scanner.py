@@ -1,11 +1,4 @@
-def build_lexer():
-    """
-    Build a ply.lexer for scanning the token stream.
-    :return: ply.lexer
-    """
-    import ply.lex as lex
-
-    reserved = {
+reserved = {
         'if': 'IF',
         'then': 'THEN',
         'end': 'END',
@@ -21,12 +14,23 @@ def build_lexer():
         'function': 'FUNCTION'
     }
 
-    tokens = ['REAL', 'ASSIGN', 'INDUCE', 'IDENTIFIER'] + list(set(reserved.values()))
-    literals = "+-*/<>=(),:;[]{}"
+tokens = ['REAL', 'ASSIGN', 'INDUCE', 'IDENTIFIER', 'LE', 'GE'] + list(set(reserved.values()))
+
+
+def build_lexer():
+    """
+    Build a ply.lexer for scanning the token stream.
+    :return: ply.lexer
+    """
+    import ply.lex as lex
+
+    literals = "+-*/<>=(),:;[]{}!"
     t_ignore_COMMENT = r'\#.*'
     t_ignore_SPACE = r'\s'
     t_ASSIGN = ':='
     t_INDUCE = '->'
+    t_GE = '>='
+    t_LE = '<='
 
     def t_REAL(t):
         """([1-9]\d*|0)(\.\d+)?"""

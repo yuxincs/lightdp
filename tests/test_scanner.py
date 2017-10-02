@@ -25,14 +25,21 @@ def test_variable_declaration():
 
 def test_if_else():
     lexer = build_lexer()
-    lexer.input('if(a > T)\n{ out := true::out; }\nelse{\nout := false::out;}')
+    lexer.input('if(a >= T)\n{ out := true::out; }\nelse{\nout := false::out;}')
     tokens = [(t.type, t.value) for t in lexer]
-    assert tokens == [('IF', 'if'), ('(', '('), ('IDENTIFIER', 'a'), ('>', '>'), ('IDENTIFIER', 'T'),
+    assert tokens == [('IF', 'if'), ('(', '('), ('IDENTIFIER', 'a'), ('GE', '>='), ('IDENTIFIER', 'T'),
                       (')', ')'), ('{', '{'), ('IDENTIFIER', 'out'), ('ASSIGN', ':='),
                       ('BOOLEAN', 'true'), (':', ':'), (':', ':'), ('IDENTIFIER', 'out'), (';', ';'),
                       ('}', '}'), ('ELSE', 'else'), ('{', '{'), ('IDENTIFIER', 'out'),
                       ('ASSIGN', ':='), ('BOOLEAN', 'false'), (':', ':'), (':', ':'), ('IDENTIFIER', 'out'),
                       (';', ';'), ('}', '}')]
+
+
+def test_not():
+    lexer = build_lexer()
+    lexer.input('if(!T)')
+    tokens = [(t.type, t.value) for t in lexer]
+    assert tokens == [('IF', 'if'), ('(', '('), ('!', '!'), ('IDENTIFIER', 'T'), (')', ')')]
 
 
 def test_lineno():
