@@ -24,7 +24,7 @@ def build_lexer():
     """
     import ply.lex as lex
 
-    literals = "+-*/<>=(),:;[]{}!"
+    literals = "+-*/<>=(),:;[]{}!?"
     t_ignore_COMMENT = r'\#.*'
     t_ignore_SPACE = r'\s'
     t_ASSIGN = ':='

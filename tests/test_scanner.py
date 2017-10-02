@@ -41,6 +41,12 @@ def test_not():
     tokens = [(t.type, t.value) for t in lexer]
     assert tokens == [('IF', 'if'), ('(', '('), ('!', '!'), ('IDENTIFIER', 'T'), (')', ')')]
 
+def test_question():
+    lexer = build_lexer()
+    lexer.input('a ? b : c;')
+    tokens = [(t.type, t.value) for t in lexer]
+    assert tokens == [('IDENTIFIER', 'a'), ('?', '?'), ('IDENTIFIER', 'b'), (':', ':'),
+                      ('IDENTIFIER', 'c'), (';', ';')]
 
 def test_lineno():
     lexer = build_lexer()
