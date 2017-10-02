@@ -8,6 +8,7 @@ def build_lexer():
     reserved = {
         'if': 'IF',
         'then': 'THEN',
+        'end': 'END',
         'else': 'ELSE',
         'true': 'BOOLEAN',
         'false': 'BOOLEAN',
@@ -20,10 +21,12 @@ def build_lexer():
         'function': 'FUNCTION'
     }
 
-    tokens = ['REAL', 'ASSIGN', 'INDUCE', 'IDENTIFIER', 'newline'] + list(set(reserved.values()))
-    literals = "+-*/<>=(),:;[]"
+    tokens = ['REAL', 'ASSIGN', 'INDUCE', 'IDENTIFIER'] + list(set(reserved.values()))
+    literals = "+-*/<>=(),:;[]{}"
     t_ignore_COMMENT = r'\#.*'
     t_ignore_SPACE = r'\s'
+    t_ASSIGN = ':='
+    t_INDUCE = '->'
 
     def t_REAL(t):
         """([1-9]\d*|0)(\.\d+)?"""
@@ -33,14 +36,6 @@ def build_lexer():
     def t_IDENTIFIER(t):
         """[_a-zA-Z]([0-9]|[a-zA-Z]|_)*"""
         t.type = reserved.get(t.value, 'IDENTIFIER')
-        return t
-
-    def t_ASSIGN(t):
-        """:="""
-        return t
-
-    def t_INDUCE(t):
-        """"->"""
         return t
 
     def t_newline(t):

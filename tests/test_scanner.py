@@ -10,7 +10,7 @@ def test_function_declaration():
                       ('IDENTIFIER', 'T'), (',', ','), ('IDENTIFIER', 'N'), (',', ','),
                       ('IDENTIFIER', 'epsilon'), (':', ':'), ('NUM_TYPE', 'num'), ('(', '('),
                       ('REAL', 0.0), (')', ')'), (';', ';'), ('IDENTIFIER', 'q'), (':', ':'),
-                      ('LIST_TYPE', 'list'), ('NUM_TYPE', 'num'),('(', '('),  ('*', '*'),
+                      ('LIST_TYPE', 'list'), ('NUM_TYPE', 'num'), ('(', '('),  ('*', '*'),
                       (')', ')'), (')', ')')]
 
 
@@ -21,6 +21,18 @@ def test_variable_declaration():
     assert tokens == [('IDENTIFIER', 'a'), ('ASSIGN', ':='), ('REAL', 1.0), (';', ';'),
                       ('IDENTIFIER', 'b'), ('ASSIGN', ':='), ('REAL', 2.0), (';', ';'),
                       ('IDENTIFIER', 'c'), ('ASSIGN', ':='), ('REAL', 3.0), (';', ';')]
+
+
+def test_if_else():
+    lexer = build_lexer()
+    lexer.input('if(a > T)\n{ out := true::out; }\nelse{\nout := false::out;}')
+    tokens = [(t.type, t.value) for t in lexer]
+    assert tokens == [('IF', 'if'), ('(', '('), ('IDENTIFIER', 'a'), ('>', '>'), ('IDENTIFIER', 'T'),
+                      (')', ')'), ('{', '{'), ('IDENTIFIER', 'out'), ('ASSIGN', ':='),
+                      ('BOOLEAN', 'true'), (':', ':'), (':', ':'), ('IDENTIFIER', 'out'), (';', ';'),
+                      ('}', '}'), ('ELSE', 'else'), ('{', '{'), ('IDENTIFIER', 'out'),
+                      ('ASSIGN', ':='), ('BOOLEAN', 'false'), (':', ':'), (':', ':'), ('IDENTIFIER', 'out'),
+                      (';', ';'), ('}', '}')]
 
 
 def test_lineno():
