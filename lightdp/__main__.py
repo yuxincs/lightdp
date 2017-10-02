@@ -1,4 +1,4 @@
-from lightdp.scanner import build_lexer
+from lightdp.lexer import build_lexer
 from lightdp.parser import build_parser
 from lightdp import __doc__
 
