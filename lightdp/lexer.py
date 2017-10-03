@@ -40,6 +40,8 @@ def build_lexer():
     def t_IDENTIFIER(t):
         """[_a-zA-Z]([0-9]|[a-zA-Z]|_)*"""
         t.type = reserved.get(t.value, 'IDENTIFIER')
+        if t.type == 'BOOLEAN':
+            t.value = True if t.value == 'true' else False
         return t
 
     def t_newline(t):
