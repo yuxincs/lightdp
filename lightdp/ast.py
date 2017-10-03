@@ -1,7 +1,7 @@
 from __future__ import print_function
 
 
-class Function:
+class FunctionDeclaration:
     def __init__(self, name, args):
         self.name = name
         self.args = args
@@ -11,6 +11,18 @@ class Function:
 
     def children(self):
         return self.args
+
+
+class IfStatement:
+    def __init__(self, condition, body):
+        self.condition = condition
+        self.body = body
+
+    def __str__(self):
+        return self.__class__.__name__
+
+    def children(self):
+        return [self.condition] + self.body
 
 
 class TypeDeclaration:
@@ -106,7 +118,7 @@ class FunctionCall:
         return self.__class__.__name__ + ': ' + self.name
 
     def children(self):
-        return self.args
+        return (self.args,) if self.args is not None else ()
 
 
 class ListIndex:
