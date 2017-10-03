@@ -18,6 +18,14 @@ def main():
     print('Files: ' + json.dumps(results.files))
     print('Out: ' + results.out)
 
+    # build lexer and parser
+    lexer = build_lexer()
+    parser = build_parser()
+
+    for file in results.files:
+        with open(file, 'r') as f:
+            parser.parse(f.read(), lexer=lexer)
+
 
 if __name__ == '__main__':
     main()
