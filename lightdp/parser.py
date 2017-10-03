@@ -15,9 +15,54 @@ def build_parser():
         ('right', '!')
     )
 
+    def p_statement(p):
+        """statement : expression ';'
+                     | assign ';'"""
+        p[0] = p[1]
+
     def p_assign(p):
         """assign : IDENTIFIER ASSIGN expression"""
         p[0] = ast.Assign(p[1], p[3])
+
+    def p_function(p):
+        """function : FUNCTION IDENTIFIER '(' type_declarations ')'"""
+        p[0] = ast.Function(p[2], p[4])
+
+    def p_type_declarations(p):
+        """type_declarations : type_declarations ';' type_declaration
+                             | type_declaration"""
+        if len(p) == 2:
+            p[0] = [p[1]]
+        else:
+            p[0] = p[1] + [p[3]]
+
+    def p_type_declaration(p):
+        """type_declaration : arg_list ':' type"""
+        p[0] = ast.TypeDeclaration(p[1], p[3])
+
+    def p_arg_list(p):
+        """arg_list : IDENTIFIER ',' arg_list
+                    | IDENTIFIER"""
+        if len(p) == 2:
+            p[0] = [ast.Variable(p[1])]
+        else:
+            p[0] = p[3] + [ast.Variable(p[1])]
+
+    def p_type(p):
+        """type : NUM_TYPE '(' expression ')'
+                | NUM_TYPE '(' '*' ')'
+                | BOOL_TYPE
+                | LIST_TYPE type
+                | type INDUCE type"""
+        if len(p) == 2:
+            p[0] = ast.Type(p[1], None)
+        elif len(p) == 5:
+            p[0] = ast.Type(p[1], p[3])
+        elif len(p) == 3:
+            p[0] = ast.Type(p[1], p[2])
+        elif len(p) == 4:
+            p[0] = ast.Type(p[1], p[2])
+
 
     def p_expression_variable(p):
         """expression : REAL
@@ -69,6 +114,6 @@ def build_parser():
     def p_error(p):
         print('Error at %s' % p)
 
-    return yacc.yacc()
+    return yacc.yacc(start='function')
 
 

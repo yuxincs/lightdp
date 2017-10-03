@@ -1,6 +1,44 @@
 from __future__ import print_function
 
 
+class Function:
+    def __init__(self, name, args):
+        self.name = name
+        self.args = args
+
+    def __str__(self):
+        return self.__class__.__name__ + ': ' + self.name
+
+    def children(self):
+        return self.args
+
+
+class TypeDeclaration:
+    def __init__(self, names, type):
+        self.names = names
+        self.type = type
+
+    def __str__(self):
+        return self.__class__.__name__
+
+    def children(self):
+        return self.names + [self.type]
+
+
+class Type:
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+
+    def __str__(self):
+        return self.__class__.__name__ + ': ' \
+               + self.left if isinstance(self.left, str) else ' ' \
+                                                              + self.right if isinstance(self.right, str) else ''
+
+    def children(self):
+        return list(filter(lambda x: not isinstance(x, str), [self.left, self.right]))
+
+
 class BinaryOperation:
     def __init__(self, operator, left, right):
         self.operator = operator
