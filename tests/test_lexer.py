@@ -29,9 +29,9 @@ def test_if_else():
     tokens = [(t.type, t.value) for t in lexer]
     assert tokens == [('IF', 'if'), ('(', '('), ('IDENTIFIER', 'a'), ('GE', '>='), ('IDENTIFIER', 'T'),
                       (')', ')'), ('{', '{'), ('IDENTIFIER', 'out'), ('ASSIGN', ':='),
-                      ('BOOLEAN', 'true'), (':', ':'), (':', ':'), ('IDENTIFIER', 'out'), (';', ';'),
+                      ('BOOLEAN', True), (':', ':'), (':', ':'), ('IDENTIFIER', 'out'), (';', ';'),
                       ('}', '}'), ('ELSE', 'else'), ('{', '{'), ('IDENTIFIER', 'out'),
-                      ('ASSIGN', ':='), ('BOOLEAN', 'false'), (':', ':'), (':', ':'), ('IDENTIFIER', 'out'),
+                      ('ASSIGN', ':='), ('BOOLEAN', False), (':', ':'), (':', ':'), ('IDENTIFIER', 'out'),
                       (';', ';'), ('}', '}')]
 
 
