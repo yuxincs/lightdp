@@ -32,8 +32,8 @@ class Type:
 
     def __str__(self):
         return self.__class__.__name__ + ': ' \
-               + self.left if isinstance(self.left, str) else ' ' \
-                                                              + self.right if isinstance(self.right, str) else ''
+               + (self.left if isinstance(self.left, str) else '') \
+               + (' ' + self.right if isinstance(self.right, str) else '')
 
     def children(self):
         return list(filter(lambda x: not isinstance(x, str), [self.left, self.right]))
