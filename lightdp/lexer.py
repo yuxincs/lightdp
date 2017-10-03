@@ -1,7 +1,5 @@
 reserved = {
         'if': 'IF',
-        'then': 'THEN',
-        'end': 'END',
         'else': 'ELSE',
         'true': 'BOOLEAN',
         'false': 'BOOLEAN',
