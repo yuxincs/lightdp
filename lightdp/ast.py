@@ -1,4 +1,40 @@
 from __future__ import print_function
+from six import string_types
+
+
+class Block:
+    def __init__(self, statements):
+        self.statements = statements
+
+    def __str__(self):
+        return self.__class__.__name__
+
+    def children(self):
+        return self.statements
+
+
+class Function:
+    def __init__(self, declaration, body):
+        self.declaration = declaration
+        self.body = body
+
+    def __str__(self):
+        return self.__class__.__name__
+
+    def children(self):
+        return self.declaration, self.body
+
+
+class While:
+    def __init__(self, condition, body):
+        self.condition = condition
+        self.body = body
+
+    def __str__(self):
+        return self.__class__.__name__
+
+    def children(self):
+        return self.condition, self.body
 
 
 class FunctionDeclaration:
@@ -14,15 +50,16 @@ class FunctionDeclaration:
 
 
 class IfStatement:
-    def __init__(self, condition, body):
+    def __init__(self, condition, body, else_body):
         self.condition = condition
         self.body = body
+        self.else_body = else_body
 
     def __str__(self):
         return self.__class__.__name__
 
     def children(self):
-        return [self.condition] + self.body
+        return (self.condition, self.body, self.else_body) if self.else_body is not None else (self.condition, self.body)
 
 
 class TypeDeclaration:
@@ -44,11 +81,11 @@ class Type:
 
     def __str__(self):
         return self.__class__.__name__ + ': ' \
-               + (self.left if isinstance(self.left, str) else '') \
-               + (' ' + self.right if isinstance(self.right, str) else '')
+               + (self.left if isinstance(self.left, string_types) else '') \
+               + (' ' + self.right if isinstance(self.right, string_types) else '')
 
     def children(self):
-        return list(filter(lambda x: not isinstance(x, str), [self.left, self.right]))
+        return list(filter(lambda x: not isinstance(x, string_types), [self.left, self.right]))
 
 
 class BinaryOperation:
