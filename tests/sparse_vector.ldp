@@ -1,4 +1,4 @@
-function SparseVector(T, N, epsilon : num_0; q : list num_*)
+function SparseVector(T, N, epsilon : num(0); q : list num(*))
 returns(out : list bool_0)
 # precondition for_all i. -1<=(q[i])<=1 {
     eta_1 := Lap (2/epsilon);
