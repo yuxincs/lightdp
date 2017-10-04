@@ -1,15 +1,28 @@
-# Add any directories, files, or patterns you don't want to be tracked by version control
-
-*~
-~*
+# Compiled python files
 *.pyc
+
+# macOS generated files
 .DS_STORE
+
+# Temporary and log files
 *.tmp
 *.log
+
+# Coverage generated files
 .coverage
+
+# Ply generated files
+parser.out
+parsetab.py
+
+# JetBrains generated files
 .idea/
+
+# Build files
 .cache/
 build/
 dist/
 *.egg-info/
+
+# Tox generated files
 .tox/
