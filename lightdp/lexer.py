@@ -6,7 +6,7 @@ reserved = {
         'num': 'NUM_TYPE',
         'bool': 'BOOL_TYPE',
         'list': 'LIST_TYPE',
-        'return': 'RETURN',
+        'returns': 'RETURNS',
         'skip': 'SKIP',
         'while': 'WHILE',
         'function': 'FUNCTION'

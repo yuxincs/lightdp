@@ -25,16 +25,15 @@ class Function:
         return self.declaration, self.body
 
 
-class While:
-    def __init__(self, condition, body):
-        self.condition = condition
-        self.body = body
+class Return:
+    def __init__(self, args):
+        self.args = args
 
     def __str__(self):
         return self.__class__.__name__
 
     def children(self):
-        return self.condition, self.body
+        return self.args
 
 
 class FunctionDeclaration:
@@ -49,7 +48,19 @@ class FunctionDeclaration:
         return self.args
 
 
-class IfStatement:
+class While:
+    def __init__(self, condition, body):
+        self.condition = condition
+        self.body = body
+
+    def __str__(self):
+        return self.__class__.__name__
+
+    def children(self):
+        return self.condition, self.body
+
+
+class If:
     def __init__(self, condition, body, else_body):
         self.condition = condition
         self.body = body
