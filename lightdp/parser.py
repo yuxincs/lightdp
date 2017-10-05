@@ -10,14 +10,66 @@ def build_parser():
 
     precedence = (
         ('left', '+', '-', '<', '>', '=', 'LE', 'GE'),
-        ('left', '*', '/'),
-        ('left', '?', ':', 'ASSIGN'),
-        ('right', '!')
+        ('left', '*', '/', ':'),
+        ('left', '?', 'CONS', 'ASSIGN', 'INDUCE'),
+        ('right', '!'),
+        ('nonassoc', 'LOWER_THAN_ELSE'),
+        ('nonassoc', 'ELSE')
     )
+
+    def p_function(p):
+        """function : function_declaration '{' statement_list '}'"""
+        p[0] = ast.Function(p[1], p[3])
+
+    def p_while(p):
+        """while : WHILE '(' expression ')' statement
+                 | WHILE '(' expression ')' '{' statement_list '}'"""
+        if len(p) == 6:
+            p[0] = ast.While(p[3], p[5])
+        elif len(p) == 8:
+            p[0] = ast.While(p[3], p[6])
+
+    def p_if(p):
+        """if : IF '(' expression ')' '{' statement_list '}' %prec LOWER_THAN_ELSE
+              | IF '(' expression ')' statement %prec LOWER_THAN_ELSE"""
+        if len(p) == 6:
+            p[0] = ast.If(p[3], p[5], None)
+        elif len(p) == 8:
+            p[0] = ast.If(p[3], p[6], None)
+
+    def p_if_with_else(p):
+        """if : IF '(' expression ')' statement ELSE statement
+              | IF '(' expression ')' statement ELSE '{' statement_list '}'"""
+        if len(p) == 8:
+            p[0] = ast.If(p[3], p[5], p[7])
+        elif len(p) == 10:
+            p[0] = ast.If(p[3], p[5], p[8])
+
+    def p_if_with_else_and_list(p):
+        """if : IF '(' expression ')' '{' statement_list '}' ELSE statement
+              | IF '(' expression ')' '{' statement_list '}' ELSE '{' statement_list '}'"""
+        if len(p) == 10:
+            p[0] = ast.If(p[3], p[6], p[9])
+        elif len(p) == 12:
+            p[0] = ast.If(p[3], p[6], p[10])
+
+    def p_statement_list(p):
+        """statement_list : statement_list statement
+                          | statement"""
+        if len(p) == 2:
+            p[0] = ast.Block([p[1]])
+        elif len(p) == 3:
+            assert isinstance(p[1], ast.Block)
+            p[1].statements.append(p[2])
+            p[0] = p[1]
 
     def p_statement(p):
         """statement : expression ';'
-                     | assign ';'"""
+                     | assign ';'
+                     | type_declarations
+                     | if
+                     | function
+                     | while"""
         p[0] = p[1]
 
     def p_assign(p):
@@ -26,7 +78,7 @@ def build_parser():
 
     def p_function_declaration(p):
         """function_declaration : FUNCTION IDENTIFIER '(' type_declarations ')' RETURNS '(' type_declarations ')'"""
-        p[0] = ast.FunctionDeclaration(p[2], p[4], p[8])
+        p[0] = ast.FunctionDeclaration(p[2], p[4], ast.Return(p[8]))
 
     def p_type_declarations(p):
         """type_declarations : type_declarations ';' type_declaration
@@ -40,7 +92,7 @@ def build_parser():
         """type_declaration : var_list ':' type
                             | IDENTIFIER ':' type"""
         if isinstance(p[1], str):
-            p[0] = ast.TypeDeclaration([p[1]], p[3])
+            p[0] = ast.TypeDeclaration([ast.Variable(p[1])], p[3])
         else:
             p[0] = ast.TypeDeclaration(p[1], p[3])
 
@@ -68,7 +120,6 @@ def build_parser():
             p[0] = ast.Type(p[1], p[2])
         elif len(p) == 4:
             p[0] = ast.Type(p[1], p[2])
-
 
     def p_expression_variable(p):
         """expression : REAL
@@ -98,10 +149,10 @@ def build_parser():
         p[0] = ast.BinaryOperation(p[2], p[1], p[3])
 
     def p_expression_other(p):
-        """expression : expression ':' ':' expression
+        """expression : expression CONS expression
                       | IDENTIFIER '[' expression ']'
                       | expression '?' expression ':' expression"""
-        if p[2] == ':':
+        if p[2] == '::':
             # TODO: :: means something else, need to edit when figured out
             p[0] = p[1]
         elif p[2] == '[':
@@ -120,6 +171,6 @@ def build_parser():
     def p_error(p):
         print('Error at %s' % p)
 
-    return yacc.yacc(start='function')
+    return yacc.yacc(start='statement_list')
 
 
