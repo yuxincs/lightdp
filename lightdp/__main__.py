@@ -24,7 +24,9 @@ def main():
     for file in results.files:
         with open(file, 'r') as f:
             node = parser.parse(f.read(), lexer=lexer)
-            print(jsonpickle.encode(node))
+            #print(jsonpickle.encode(node))
+            s = ast.transform(node)
+            print(s)
 
 
 if __name__ == '__main__':
