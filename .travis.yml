@@ -25,7 +25,9 @@ jobs:
   include:
     - stage: codecov
       python: nightly
-      script: pip install codecov && codecov --token=$CODECOV_TOKEN
+      script:
+        - tox
+        - pip install codecov && codecov --token=$CODECOV_TOKEN
 
 notifications:
   email: false
