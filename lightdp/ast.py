@@ -169,6 +169,6 @@ class Assign:
 
 
 def transform(statements):
-    s = 'import lightdp\n\n'
+    s = 'import lightdp\n\n\n'
     s += '\n'.join([stmt.transform() for stmt in statements])
     return s
