@@ -1,16 +1,14 @@
-class Block:
-    def __init__(self, statements):
-        self.statements = statements
-
-
 class Function:
     def __init__(self, declaration, body):
+        assert isinstance(body, list)
         self.declaration = declaration
         self.body = body
 
 
 class FunctionDeclaration:
     def __init__(self, name, args, returns):
+        assert isinstance(args, list)
+        assert isinstance(returns, list)
         self.name = name
         self.args = args
         self.returns = returns
@@ -18,12 +16,15 @@ class FunctionDeclaration:
 
 class While:
     def __init__(self, condition, body):
+        assert isinstance(body, list)
         self.condition = condition
         self.body = body
 
 
 class If:
     def __init__(self, condition, body, else_body):
+        assert isinstance(body, list)
+        assert isinstance(else_body, list)
         self.condition = condition
         self.body = body
         self.else_body = else_body
@@ -31,6 +32,7 @@ class If:
 
 class TypeDeclaration:
     def __init__(self, names, type):
+        assert isinstance(names, list)
         self.names = names
         self.type = type
 
@@ -71,6 +73,7 @@ class Boolean:
 
 class FunctionCall:
     def __init__(self, name, args):
+        assert isinstance(args, list)
         self.name = name
         self.args = args
 
