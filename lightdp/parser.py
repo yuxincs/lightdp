@@ -145,19 +145,16 @@ def build_parser():
                       | expression '>' expression
                       | expression '=' expression
                       | expression LE expression
-                      | expression GE expression"""
+                      | expression GE expression
+                      | expression CONS expression"""
         p[0] = ast.BinaryOperation(p[2], p[1], p[3])
 
     def p_expression_other(p):
-        """expression : expression CONS expression
-                      | IDENTIFIER '[' expression ']'
+        """expression : IDENTIFIER '[' expression ']'
                       | expression '?' expression ':' expression"""
-        if p[2] == '::':
-            # TODO: :: means something else, need to edit when figured out
-            p[0] = p[1]
-        elif p[2] == '[':
+        if len(p) == 5:
             p[0] = ast.ListIndex(p[1], p[3])
-        elif p[2] == '?':
+        elif len(p) == 6:
             p[0] = ast.ConditionalVariable(p[1], p[3], p[5])
 
     def p_expression_call(p):
