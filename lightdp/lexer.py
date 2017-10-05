@@ -12,7 +12,7 @@ reserved = {
         'function': 'FUNCTION'
     }
 
-tokens = ['REAL', 'ASSIGN', 'INDUCE', 'IDENTIFIER', 'LE', 'GE'] + list(set(reserved.values()))
+tokens = ['REAL', 'ASSIGN', 'INDUCE', 'IDENTIFIER', 'LE', 'GE', 'CONS'] + list(set(reserved.values()))
 
 
 def build_lexer():
@@ -29,6 +29,7 @@ def build_lexer():
     t_INDUCE = '->'
     t_GE = '>='
     t_LE = '<='
+    t_CONS = '::'
 
     def t_REAL(t):
         """([1-9]\d*|0)(\.\d+)?"""
