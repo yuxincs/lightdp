@@ -20,10 +20,11 @@ def main():
     lexer = build_lexer()
     parser = build_parser()
 
+    import jsonpickle
     for file in results.files:
         with open(file, 'r') as f:
             node = parser.parse(f.read(), lexer=lexer)
-            ast.render(node)
+            print(jsonpickle.encode(node))
 
 
 if __name__ == '__main__':
