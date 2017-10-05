@@ -57,10 +57,10 @@ def build_parser():
         """statement_list : statement_list statement
                           | statement"""
         if len(p) == 2:
-            p[0] = ast.Block([p[1]])
+            p[0] = [p[1]]
         elif len(p) == 3:
-            assert isinstance(p[1], ast.Block)
-            p[1].statements.append(p[2])
+            assert isinstance(p[1], list)
+            p[1].append(p[2])
             p[0] = p[1]
 
     def p_statement(p):
@@ -121,6 +121,16 @@ def build_parser():
         elif len(p) == 4:
             p[0] = ast.Type(p[1], p[2])
 
+    def p_expression_list(p):
+        """expression_list : expression_list ',' expression
+                           | expression"""
+        if len(p) == 2:
+            p[0] = [p[1]]
+        elif len(p) == 4:
+            assert isinstance(p[1], list)
+            p[1].append(p[3])
+            p[0] = p[1]
+
     def p_expression_variable(p):
         """expression : REAL
                       | BOOLEAN
@@ -159,7 +169,7 @@ def build_parser():
 
     def p_expression_call(p):
         """expression : IDENTIFIER '(' ')'
-                      | IDENTIFIER '(' expression ')'"""
+                      | IDENTIFIER '(' expression_list ')'"""
         if len(p) == 4:
             p[0] = ast.FunctionCall(p[1], None)
         elif len(p) == 5:
