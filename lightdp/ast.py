@@ -97,7 +97,7 @@ class Type:
                + (' ' + self.right if isinstance(self.right, string_types) else '')
 
     def children(self):
-        return list(filter(lambda x: not isinstance(x, string_types), [self.left, self.right]))
+        return list(filter(lambda x: x is not None and not isinstance(x, string_types), [self.left, self.right]))
 
 
 class BinaryOperation:
@@ -152,7 +152,7 @@ class Boolean:
         self.value = value
 
     def __str__(self):
-        return self.__class__.__name__ + ': ' + self.value
+        return self.__class__.__name__ + ': ' + str(self.value)
 
     def children(self):
         return ()
