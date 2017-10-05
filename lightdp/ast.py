@@ -1,17 +1,12 @@
+
+
 class Function:
-    def __init__(self, declaration, body):
+    def __init__(self, name, args, returns, body):
         assert isinstance(body, list)
-        self.declaration = declaration
-        self.body = body
-
-
-class FunctionDeclaration:
-    def __init__(self, name, args, returns):
-        assert isinstance(args, list)
-        assert isinstance(returns, list)
         self.name = name
         self.args = args
         self.returns = returns
+        self.body = body
 
 
 class While:

@@ -20,8 +20,8 @@ def build_parser():
     )
 
     def p_function(p):
-        """function : function_declaration '{' statement_list '}'"""
-        p[0] = ast.Function(p[1], p[3])
+        """function : FUNCTION IDENTIFIER '(' type_declarations ')' RETURNS '(' type_declarations ')' '{' statement_list '}'"""
+        p[0] = ast.Function(p[2], p[4], p[8], p[11])
 
     def p_while(p):
         """while : WHILE '(' expression ')' statement
@@ -77,10 +77,6 @@ def build_parser():
     def p_assign(p):
         """assign : IDENTIFIER ASSIGN expression"""
         p[0] = ast.Assign(p[1], p[3])
-
-    def p_function_declaration(p):
-        """function_declaration : FUNCTION IDENTIFIER '(' type_declarations ')' RETURNS '(' type_declarations ')'"""
-        p[0] = ast.FunctionDeclaration(p[2], p[4], p[8])
 
     def p_type_declarations(p):
         """type_declarations : type_declarations ';' type_declaration
