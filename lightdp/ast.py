@@ -1,5 +1,5 @@
 function_map = {
-    'Lap': 'lightdp.distribution.lap'
+    'Lap': 'lightdp.distributions.lap'
 }
 
 
