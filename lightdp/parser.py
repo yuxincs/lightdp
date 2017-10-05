@@ -11,6 +11,7 @@ def build_parser():
     precedence = (
         ('left', '+', '-', '<', '>', '=', 'LE', 'GE'),
         ('left', '*', '/', ':'),
+        ('right', 'UMINUS'),
         ('left', '?', 'CONS', 'ASSIGN', 'INDUCE'),
         ('right', '!'),
         ('nonassoc', 'LOWER_THAN_ELSE'),
@@ -143,7 +144,8 @@ def build_parser():
             p[0] = ast.Boolean(p[1])
 
     def p_expression_unary(p):
-        """expression : '!' expression"""
+        """expression : '!' expression
+                      | '-' expression %prec UMINUS"""
         p[0] = ast.UnaryOperation(p[1], p[2])
 
     def p_expression_binary(p):
