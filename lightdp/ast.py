@@ -25,17 +25,6 @@ class Function:
         return self.declaration, self.body
 
 
-class Return:
-    def __init__(self, args):
-        self.args = args
-
-    def __str__(self):
-        return self.__class__.__name__
-
-    def children(self):
-        return self.args
-
-
 class FunctionDeclaration:
     def __init__(self, name, args, returns):
         self.name = name

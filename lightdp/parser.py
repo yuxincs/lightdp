@@ -78,7 +78,7 @@ def build_parser():
 
     def p_function_declaration(p):
         """function_declaration : FUNCTION IDENTIFIER '(' type_declarations ')' RETURNS '(' type_declarations ')'"""
-        p[0] = ast.FunctionDeclaration(p[2], p[4], ast.Return(p[8]))
+        p[0] = ast.FunctionDeclaration(p[2], p[4], p[8])
 
     def p_type_declarations(p):
         """type_declarations : type_declarations ';' type_declaration
