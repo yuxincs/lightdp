@@ -92,7 +92,7 @@ class BinaryOperation:
             if isinstance(self.right, Variable) or isinstance(self.right, Real) or isinstance(self.right, Boolean) \
             else '(' + self.right.transform() + ')'
         if self.operator == '::':
-            return _indent(depth) + right + '.append(' + left + ')'
+            return _indent(depth) + '(' + right + ' + ' + '[' + left + ']' + ')'
         else:
             return _indent(depth) + left + ' ' + self.operator + ' ' + right
 
