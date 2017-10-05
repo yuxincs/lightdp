@@ -26,7 +26,7 @@ class Function:
         s += '\n'.join([stmt.transform(depth + 1) for stmt in self.body]) + '\n'
 
         # add return statement
-        s += _indent(depth + 1) + 'return ' + ','.join([arg.transform() for arg in self.returns])
+        s += _indent(depth + 1) + 'return ' + ', '.join([arg.transform() for arg in self.returns]) + '\n'
         return s
 
 
@@ -65,7 +65,7 @@ class TypeDeclaration:
         self.type = type
 
     def transform(self, depth=0):
-        return _indent(depth) + ','.join([name.transform() for name in self.names])
+        return _indent(depth) + ', '.join([name.transform() for name in self.names])
 
 
 class Type:
@@ -137,7 +137,8 @@ class FunctionCall:
         self.args = args
 
     def transform(self, depth=0):
-        return _indent(depth) + function_map.get(self.name, self.name) + '(' + ','.join([arg.transform() for arg in self.args]) + ')'
+        return _indent(depth) + function_map.get(self.name, self.name) + '(' + \
+               ', '.join([arg.transform() for arg in self.args]) + ')'
 
 
 class ListIndex:
@@ -156,7 +157,8 @@ class ConditionalVariable:
         self.false = false
 
     def transform(self, depth=0):
-        return _indent(depth) + self.true.transform() + ' if ' + self.condition.transform() + ' else '+ self.false.transform()
+        return _indent(depth) + self.true.transform() + ' if ' + self.condition.transform() + ' else ' \
+               + self.false.transform()
 
 
 class Assign:
