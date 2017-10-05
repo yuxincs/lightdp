@@ -17,7 +17,7 @@ class Function:
 
     def transform(self, depth=0):
         args_str = [arg.transform() for arg in self.args]
-        s = _indent(depth) + 'def ' + self.name + '(' + ','.join(args_str) + '):\n'
+        s = _indent(depth) + 'def ' + self.name + '(' + ', '.join(args_str) + '):\n'
         # add return variable declarations
         for arg in self.returns:
             init_value = '[]' if arg.type.left == 'list' else '0'
