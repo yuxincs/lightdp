@@ -4,7 +4,7 @@ function_map = {
 
 
 def _indent(depth=0):
-    return '  ' * depth
+    return '    ' * depth
 
 
 class Function:
