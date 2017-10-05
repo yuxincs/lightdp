@@ -11,9 +11,10 @@ def build_parser():
     precedence = (
         ('left', '+', '-', '<', '>', '=', 'LE', 'GE'),
         ('left', '*', '/', ':'),
-        ('right', 'UMINUS'),
         ('left', '?', 'CONS', 'ASSIGN', 'INDUCE'),
+        ('right', 'UMINUS'),
         ('right', '!'),
+        ('left', 'LIST_TYPE', 'NUM_TYPE'),
         ('nonassoc', 'LOWER_THAN_ELSE'),
         ('nonassoc', 'ELSE')
     )
