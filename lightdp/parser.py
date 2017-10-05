@@ -106,9 +106,9 @@ def build_parser():
     def p_expression_call(p):
         """expression : IDENTIFIER '(' ')'
                       | IDENTIFIER '(' expression ')'"""
-        if len(p) == 3:
+        if len(p) == 4:
             p[0] = ast.FunctionCall(p[1], None)
-        else:
+        elif len(p) == 5:
             p[0] = ast.FunctionCall(p[1], p[3])
 
     def p_error(p):
