@@ -33,7 +33,10 @@ def build_lexer():
 
     def t_REAL(t):
         """([1-9]\d*|0)(\.\d+)?"""
-        t.value = float(t.value)
+        if '.' in t.value:
+            t.value = float(t.value)
+        else:
+            t.value = int(t.value)
         return t
 
     def t_IDENTIFIER(t):

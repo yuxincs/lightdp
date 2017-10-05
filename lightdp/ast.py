@@ -20,7 +20,7 @@ class Function:
         s = _indent(depth) + 'def ' + self.name + '(' + ','.join(args_str) + '):\n'
         # add return variable declarations
         for arg in self.returns:
-            init_value = '[]' if arg.type.left == 'list' else '0.0'
+            init_value = '[]' if arg.type.left == 'list' else '0'
             s += _indent(depth + 1) + '\n'.join([name.transform() + ' = ' + init_value for name in arg.names]) + '\n'
 
         s += '\n'.join([stmt.transform(depth + 1) for stmt in self.body]) + '\n'
