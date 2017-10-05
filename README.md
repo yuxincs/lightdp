@@ -1,29 +1,27 @@
-# README #
+# LightDP
 
-This README would normally document whatever steps are necessary to get your application up and running.
+A Light-Weight imperative language for developing provably privacy-preserving algorithms.
+More details can be found [here](http://www.cse.psu.edu/~dbz5017/pub/popl17.pdf).
 
-### What is this repository for? ###
+This project presents a tool for transforming LightDP programs into Python programs along with differential-privacy proofs.
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+# Usage
 
-### How do I get set up? ###
+To install it, run
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+```python
+$ python setup.py install
+```
 
-### Contribution guidelines ###
+Then to transform LightDP program `source.ldp` to `output.py`, run
 
-* Writing tests
-* Code review
-* Other guidelines
+```python
+$ lightdp source.ldp -o output.py
+```
 
-### Who do I talk to? ###
+This program can also run as a module like
+```python
+$ python -m lightdp source.ldp -o output.py
+```
 
-* Repo owner or admin
-* Other community or team contact
+Remember to check the requirement in `setup.py` if you do so.
