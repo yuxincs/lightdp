@@ -1,1 +1,2 @@
-; needs to exist otherwise `$ coveralls` fails
+[run]
+source=lightdp
