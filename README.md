@@ -9,18 +9,19 @@ This project presents a tool for transforming LightDP programs into Python progr
 
 To install it, run
 
-```python
+```bash
 $ python setup.py install
 ```
 
 Then to transform LightDP program `source.ldp` to `output.py`, run
 
-```python
+```bash
 $ lightdp source.ldp -o output.py
 ```
 
 This program can also run as a module like
-```python
+
+```bash
 $ python -m lightdp source.ldp -o output.py
 ```
 
