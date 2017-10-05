@@ -37,15 +37,16 @@ class Return:
 
 
 class FunctionDeclaration:
-    def __init__(self, name, args):
+    def __init__(self, name, args, returns):
         self.name = name
         self.args = args
+        self.returns = returns
 
     def __str__(self):
         return self.__class__.__name__ + ': ' + self.name
 
     def children(self):
-        return self.args
+        return self.args + [self.returns]
 
 
 class While:
