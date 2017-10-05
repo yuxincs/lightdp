@@ -37,16 +37,22 @@ def build_parser():
             p[0] = p[1] + [p[3]]
 
     def p_type_declaration(p):
-        """type_declaration : arg_list ':' type"""
-        p[0] = ast.TypeDeclaration(p[1], p[3])
+        """type_declaration : var_list ':' type
+                            | IDENTIFIER ':' type"""
+        if isinstance(p[1], str):
+            p[0] = ast.TypeDeclaration([p[1]], p[3])
+        else:
+            p[0] = ast.TypeDeclaration(p[1], p[3])
 
     def p_arg_list(p):
-        """arg_list : IDENTIFIER ',' arg_list
-                    | IDENTIFIER"""
-        if len(p) == 2:
-            p[0] = [ast.Variable(p[1])]
+        """var_list : IDENTIFIER ',' var_list
+                    | IDENTIFIER ',' IDENTIFIER"""
+        # cannot simply use IDENTIFIER on this which will cause reduce/reduce conlficts
+        # with expression rule
+        if isinstance(p[3], list):
+            p[0] = [ast.Variable(p[1])] + p[3]
         else:
-            p[0] = p[3] + [ast.Variable(p[1])]
+            p[0] = [ast.Variable(p[1]), ast.Variable(p[3])]
 
     def p_type(p):
         """type : NUM_TYPE '(' expression ')'
