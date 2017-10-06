@@ -1,6 +1,5 @@
 from setuptools import setup, find_packages
 from codecs import open
-import lightdp
 
 # Get the long description from the relevant file
 with open('README.md', encoding='utf-8') as f:
@@ -8,8 +7,8 @@ with open('README.md', encoding='utf-8') as f:
 
 setup(
     name='LightDP',
-    version=lightdp.__version__,
-    description=lightdp.__doc__.strip(),
+    version='0.1',
+    description='LightDP - A Light-Weight Imperative Language That Provides Differential Privacy Proofs.',
     long_description=long_description,
     url='',
     author='Danfeng Zhang/Daniel Kifer/Yuin Wang/Ding Ding',
