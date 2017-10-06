@@ -71,8 +71,12 @@ def build_parser():
                      | type_declarations
                      | if
                      | function
-                     | while"""
-        p[0] = p[1]
+                     | while
+                     | SKIP"""
+        if p[1] == 'skip':
+            p[0] = ast.Pass()
+        else:
+            p[0] = p[1]
 
     def p_assign(p):
         """assign : IDENTIFIER ASSIGN expression"""

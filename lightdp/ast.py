@@ -7,6 +7,14 @@ def _indent(depth=0):
     return '    ' * depth
 
 
+class Pass:
+    def __init__(self):
+        pass
+
+    def transform(self, depth=0):
+        return _indent(depth) + 'continue'
+
+
 class Function:
     def __init__(self, name, args, returns, body):
         assert isinstance(body, list)
