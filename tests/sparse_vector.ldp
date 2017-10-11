@@ -1,11 +1,11 @@
-function SparseVector(T, N, epsilon : num(0); q : list num(*))
+function SparseVector(T, N, len, epsilon : num(0); q : list num(*))
 returns(out : list bool)
 # precondition for_all i. -1<=(q[i])<=1
 {
     eta_1 := Lap (2/epsilon);
     T_threshold := T + eta_1;
     c1 := 0; c2 := 0; i := 0;
-    while (c1 < N) {
+    while (c1 < N and i < len) {
         eta_2 := Lap (4 * N/epsilon);
         if (q[i] + eta_2 >= T_threshold) {
             out := true::out;
