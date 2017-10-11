@@ -6,14 +6,14 @@ import json
 
 __function_map = {
     'lap': {
-        'name': 'numpy.random.laplace',
+        'name': 'laplace',
         'args': {'loc': 0.0, 'size': None}
     }
 }
 
 # add another layer for mapping for security
 __numpy_map = {
-    'numpy.random.laplace': numpy.random.laplace
+    'laplace': numpy.random.laplace
 }
 
 
