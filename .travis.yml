@@ -17,6 +17,8 @@ cache: pip
 
 install:
   - pip install tox-travis
+  - pip install pysmt
+  - pysmt-install --z3 && $(pysmt-install --env) && pysmt-install --check
 
 script:
   - tox
