@@ -9,6 +9,7 @@ def build_parser():
     from lightdp.lexer import tokens
 
     precedence = (
+        ('left', 'AND', 'OR'),
         ('left', '+', '-', '<', '>', '=', 'LE', 'GE'),
         ('left', '*', '/', ':'),
         ('left', '?', 'CONS', 'ASSIGN', 'INDUCE'),
@@ -159,6 +160,8 @@ def build_parser():
                       | expression '=' expression
                       | expression LE expression
                       | expression GE expression
+                      | expression AND expression
+                      | expression OR expression
                       | expression CONS expression"""
         p[0] = ast.BinaryOperation(p[2], p[1], p[3])
 

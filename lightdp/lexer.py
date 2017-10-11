@@ -9,7 +9,9 @@ reserved = {
         'returns': 'RETURNS',
         'skip': 'SKIP',
         'while': 'WHILE',
-        'function': 'FUNCTION'
+        'function': 'FUNCTION',
+        'and': 'AND',
+        'or': 'OR'
     }
 
 tokens = ['REAL', 'ASSIGN', 'INDUCE', 'IDENTIFIER', 'LE', 'GE', 'CONS'] + list(set(reserved.values()))
