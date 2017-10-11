@@ -1,0 +1,6 @@
+{
+  "lap": {
+      "name": "numpy.random.laplacess",
+      "args": {"loc": 0.0, "size": null}
+  }
+}

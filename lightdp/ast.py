@@ -1,5 +1,5 @@
 function_map = {
-    'Lap': 'lightdp.distributions.lap'
+    'Lap': 'lightdp.distributions.sample(\'lap\')'
 }
 
 
@@ -178,7 +178,11 @@ class Assign:
         return _indent(depth) + self.name + ' = ' + self.expression.transform()
 
 
-def transform(statements):
+def transform(statements, config=None):
     s = 'import lightdp\n\n\n'
+    if config is not None:
+        s += 'config = '
+        s += str(config) + '\n'
+        s += 'lightdp.distributions.load_config(config)\n\n\n'
     s += '\n'.join([stmt.transform() for stmt in statements])
     return s
