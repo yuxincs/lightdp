@@ -140,7 +140,7 @@ def build_parser():
                       | IDENTIFIER"""
         if isinstance(p[1], str):
             p[0] = ast.Variable(p[1])
-        elif isinstance(p[1], float):
+        elif isinstance(p[1], float) or isinstance(p[1], int):
             p[0] = ast.Real(p[1])
         else:
             p[0] = ast.Boolean(p[1])
