@@ -21,8 +21,8 @@ def build_parser():
     )
 
     def p_function(p):
-        """function : FUNCTION IDENTIFIER '(' type_declarations ')' RETURNS '(' type_declarations ')' '{' statement_list '}'"""
-        p[0] = ast.Function(p[2], p[4], p[8], p[11])
+        """function : FUNCTION IDENTIFIER '(' type_declarations ')' RETURNS '(' type_declarations ')' PRECONDITION '(' expression ')' '{' statement_list '}'"""
+        p[0] = ast.Function(p[2], p[4], p[8], p[12], p[15])
 
     def p_while(p):
         """while : WHILE '(' expression ')' statement

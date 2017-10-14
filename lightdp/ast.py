@@ -16,11 +16,12 @@ class Pass:
 
 
 class Function:
-    def __init__(self, name, args, returns, body):
+    def __init__(self, name, args, returns, precondition, body):
         assert isinstance(body, list)
         self.name = name
         self.args = args
         self.returns = returns
+        self.precondition = precondition
         self.body = body
 
     def transform(self, depth=0):

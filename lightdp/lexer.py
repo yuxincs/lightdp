@@ -11,7 +11,8 @@ reserved = {
         'while': 'WHILE',
         'function': 'FUNCTION',
         'and': 'AND',
-        'or': 'OR'
+        'or': 'OR',
+        'precondition': 'PRECONDITION'
     }
 
 tokens = ['REAL', 'ASSIGN', 'INDUCE', 'IDENTIFIER', 'LE', 'GE', 'CONS'] + list(set(reserved.values()))

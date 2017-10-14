@@ -1,6 +1,6 @@
 function SparseVector(T, N, len, epsilon : num(0); q : list num(*))
 returns(out : list bool)
-# precondition for_all i. -1<=(q[i])<=1
+precondition(q[i] >= -1 and q[i] <= 1)
 {
     eta_1 := Lap (2/epsilon);
     T_threshold := T + eta_1;
