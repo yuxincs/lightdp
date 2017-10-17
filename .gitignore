@@ -26,3 +26,6 @@ dist/
 
 # Tox generated files
 .tox/
+
+# Python cache
+_pycache_/
