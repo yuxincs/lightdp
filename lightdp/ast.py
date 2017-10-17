@@ -24,15 +24,40 @@ class Function:
         self.precondition = precondition
         self.body = body
 
-    def transform(self, depth=0):
+    def transform(self, depth=0, is_verification=False):
         args_str = [arg.transform() for arg in self.args]
         s = _indent(depth) + 'def ' + self.name + '(' + ', '.join(args_str) + '):\n'
+
+        if is_verification:
+            s += _indent(depth + 1) + '__V_epsilon = 0\n'
+            for arg in self.args:
+                assert isinstance(arg, TypeDeclaration)
+                for var in arg.names:
+                    assert isinstance(var, Variable)
+                    _type_map[var.name] = arg.type
+
+            for ret in self.returns:
+                assert isinstance(ret, TypeDeclaration)
+                for var in ret.names:
+                    assert isinstance(var, Variable)
+                    _type_map[var.name] = ret.type
+
         # add return variable declarations
         for arg in self.returns:
             init_value = '[]' if arg.type.left == 'list' else '0'
             s += _indent(depth + 1) + '\n'.join([name.transform() + ' = ' + init_value for name in arg.names]) + '\n'
 
-        s += '\n'.join([stmt.transform(depth + 1) for stmt in self.body]) + '\n'
+        # manual type annotation can only appear on the first line of body
+        if is_verification and isinstance(self.body[0], list):
+            for arg in self.body[0]:
+                assert isinstance(arg, TypeDeclaration)
+                for var in arg.names:
+                    assert isinstance(var, Variable)
+                    _type_map[var.name] = arg.type
+
+            self.body = self.body[1:]
+
+        s += '\n'.join([stmt.transform(depth + 1, is_verification=is_verification) for stmt in self.body]) + '\n'
 
         # add return statement
         s += _indent(depth + 1) + 'return ' + ', '.join([arg.transform() for arg in self.returns]) + '\n'
@@ -45,9 +70,9 @@ class While:
         self.condition = condition
         self.body = body
 
-    def transform(self, depth=0):
+    def transform(self, depth=0, is_verification=False):
         s = _indent(depth) + 'while ' + self.condition.transform() + ':\n'
-        s += '\n'.join([stmt.transform(depth + 1) for stmt in self.body])
+        s += '\n'.join([stmt.transform(depth + 1, is_verification=is_verification) for stmt in self.body])
         return s
 
 
@@ -59,7 +84,7 @@ class If:
         self.body = body
         self.else_body = else_body
 
-    def transform(self, depth=0):
+    def transform(self, depth=0, is_verification=False):
         s = _indent(depth) + 'if ' + self.condition.transform() + ':\n'
         s += '\n'.join([stmt.transform(depth + 1) for stmt in self.body]) + '\n'
         s += _indent(depth) + 'else:\n'
@@ -73,7 +98,7 @@ class TypeDeclaration:
         self.names = names
         self.type = type
 
-    def transform(self, depth=0):
+    def transform(self, depth=0, is_verification=False):
         return _indent(depth) + ', '.join([name.transform() for name in self.names])
 
 
@@ -82,7 +107,7 @@ class Type:
         self.left = left
         self.right = right
 
-    def transform(self, depth=0):
+    def transform(self, depth=0, is_verification=False):
         # currently we won't transform type instructions
         assert False
 
@@ -93,7 +118,7 @@ class BinaryOperation:
         self.left = left
         self.right = right
 
-    def transform(self, depth=0):
+    def transform(self, depth=0, is_verification=False):
         left = self.left.transform() \
             if isinstance(self.left, Variable) or isinstance(self.left, Real) or isinstance(self.left, Boolean) \
             else '(' + self.left.transform() + ')'
@@ -107,7 +132,7 @@ class BinaryOperation:
 
 
 class UnaryOperation:
-    def __init__(self, operator, operand):
+    def __init__(self, operator, operand, is_verification=False):
         self.operator = operator
         self.operand = operand
 
@@ -119,7 +144,7 @@ class Variable:
     def __init__(self, name):
         self.name = name
 
-    def transform(self, depth=0):
+    def transform(self, depth=0, is_verification=False):
         return _indent(depth) + self.name
 
 
@@ -127,7 +152,7 @@ class Real:
     def __init__(self, value):
         self.value = value
 
-    def transform(self, depth=0):
+    def transform(self, depth=0, is_verification=False):
         return _indent(depth) + str(self.value)
 
 
@@ -135,7 +160,7 @@ class Boolean:
     def __init__(self, value):
         self.value = value
 
-    def transform(self, depth=0):
+    def transform(self, depth=0, is_verification=False):
         return _indent(depth) + str(self.value)
 
 
@@ -145,7 +170,7 @@ class FunctionCall:
         self.name = name
         self.args = args
 
-    def transform(self, depth=0):
+    def transform(self, depth=0, is_verification=False):
         return _indent(depth) + function_map.get(self.name, self.name) + '(' + \
                ', '.join([arg.transform() for arg in self.args]) + ')'
 
@@ -155,7 +180,7 @@ class ListIndex:
         self.name = name
         self.index = index
 
-    def transform(self, depth=0):
+    def transform(self, depth=0, is_verification=False):
         return _indent(depth) + self.name + '[' + self.index.transform() + ']'
 
 
@@ -165,7 +190,7 @@ class ConditionalVariable:
         self.true = true
         self.false = false
 
-    def transform(self, depth=0):
+    def transform(self, depth=0, is_verification=False):
         return _indent(depth) + self.true.transform() + ' if ' + self.condition.transform() + ' else ' \
                + self.false.transform()
 
@@ -175,15 +200,32 @@ class Assign:
         self.name = name
         self.expression = expression
 
-    def transform(self, depth=0):
-        return _indent(depth) + self.name + ' = ' + self.expression.transform()
+    def transform(self, depth=0, is_verification=False):
+        if is_verification and isinstance(self.expression, FunctionCall):
+            # currently we only support laplace distribution
+            assert self.expression.name == 'Lap'
+            s = _indent(depth) + self.name + ' = havoc()\n'
+            s += _indent(depth) + '__V_epsilon += ' + '1.0 / (' + self.expression.args[0].transform(0) + ')'
+            return s
+        else:
+            return _indent(depth) + self.name + ' = ' + self.expression.transform()
 
 
-def transform(statements, config=None):
+_type_map = {}
+
+
+def transform(statements, config=None, is_verification=False):
     s = 'import lightdp\n\n\n'
+
+    if is_verification:
+        s += 'def havoc():\n    return 0\n\n\n'
+
     if config is not None:
         s += 'config = '
         s += str(config) + '\n'
         s += 'lightdp.distributions.load_config(config)\n\n\n'
-    s += '\n'.join([stmt.transform() for stmt in statements])
+    s += '\n'.join([stmt.transform(is_verification=is_verification) for stmt in statements])
+
+    import jsonpickle
+    print(jsonpickle.encode(_type_map))
     return s

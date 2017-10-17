@@ -35,13 +35,13 @@ def main():
             node = parser.parse(f.read(), lexer=lexer)
             if results.out is None:
                 with open(file[0:results.files[0].rfind('.')] + '.py', 'w') as out:
-                    out.write(ast.transform(node, config))
+                    out.write(ast.transform(node, config, is_verification=True))
             else:
                 all_parse_trees += node
 
     if results.out is not None:
         with open(results.out, 'w') as out:
-            out.write(ast.transform(all_parse_trees, config))
+            out.write(ast.transform(all_parse_trees, config, is_verification=True))
 
 
 if __name__ == '__main__':
