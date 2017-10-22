@@ -3,8 +3,9 @@ def build_parser():
     Build a ply.parser for parsing LightDP
     :return: ply parser
     """
-    import lightdp.ast as ast
+    from lightdp.type import Type
     import ply.yacc as yacc
+    import ast
 
     from lightdp.lexer import tokens
 
@@ -14,7 +15,7 @@ def build_parser():
 
     def p_annotation(p):
         """annotation : PRECONDITION EXPRESSION ';' type_declarations"""
-        p[0] = (p[2], p[4])
+        p[0] = (ast.parse(p[2]), p[4])
 
     def p_type_declarations(p):
         """type_declarations : type_declarations ';' type_declaration
@@ -48,11 +49,18 @@ def build_parser():
                 | type TO type"""
 
         if len(p) == 2:
-            p[0] = ast.Type(p[1], None)
+            p[0] = Type(p[1], None)
         elif len(p) == 3:
-            p[0] = ast.Type(p[1], p[2])
+            try:
+                basestring
+            except NameError:
+                basestring = str
+            if isinstance(p[2], basestring):
+                p[0] = Type(p[1], ast.parse(p[2]))
+            else:
+                p[0] = Type(p[1], p[2])
         elif len(p) == 4:
-            p[0] = ast.Type(p[1], p[2])
+            p[0] = Type(p[1], p[2])
 
     def p_error(p):
         print('Error at %s' % p)
