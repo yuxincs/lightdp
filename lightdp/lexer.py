@@ -1,21 +1,11 @@
 reserved = {
-        'if': 'IF',
-        'else': 'ELSE',
-        'true': 'BOOLEAN',
-        'false': 'BOOLEAN',
         'num': 'NUM_TYPE',
         'bool': 'BOOL_TYPE',
         'list': 'LIST_TYPE',
-        'returns': 'RETURNS',
-        'skip': 'SKIP',
-        'while': 'WHILE',
-        'function': 'FUNCTION',
-        'and': 'AND',
-        'or': 'OR',
         'precondition': 'PRECONDITION'
     }
 
-tokens = ['REAL', 'ASSIGN', 'INDUCE', 'IDENTIFIER', 'LE', 'GE', 'CONS'] + list(set(reserved.values()))
+tokens = ['IDENTIFIER', 'EXPRESSION', 'TO'] + list(set(reserved.values()))
 
 
 def build_lexer():
@@ -25,28 +15,48 @@ def build_lexer():
     """
     import ply.lex as lex
 
-    literals = "+-*/<>=(),:;[]{}!?"
-    t_ignore_COMMENT = r'\#.*'
+    literals = "();:*,"
     t_ignore_SPACE = r'\s'
-    t_ASSIGN = ':='
-    t_INDUCE = '->'
-    t_GE = '>='
-    t_LE = '<='
-    t_CONS = '::'
+    t_TO = '->'
 
-    def t_REAL(t):
-        """([1-9]\d*|0)(\.\d+)?"""
-        if '.' in t.value:
-            t.value = float(t.value)
-        else:
-            t.value = int(t.value)
-        return t
+    states = (
+        ('expression', 'exclusive'),
+    )
+
+    def t_expression(t):
+        """\("""
+        t.lexer.expression_start = t.lexer.lexpos
+        t.lexer.level = 1
+        t.lexer.begin('expression')
+
+    def t_expression_lbrace(t):
+        """\("""
+        t.lexer.level += 1
+
+    def t_expression_rbrace(t):
+        """\)"""
+        t.lexer.level -= 1
+
+        if t.lexer.level == 0:
+            t.value = t.lexer.lexdata[t.lexer.expression_start:t.lexer.lexpos - 1]
+            if t.value == '*':
+                t.type = '*'
+            else:
+                t.type = 'EXPRESSION'
+                t.lexer.lineno += t.value.count('\n')
+            t.lexer.begin('INITIAL')
+            return t
+
+    def t_expression_content(t):
+        """[^\(\)]"""
+        pass
+
+    def t_expression_error(t):
+        t_error(t)
 
     def t_IDENTIFIER(t):
         """[_a-zA-Z]([0-9]|[a-zA-Z]|_)*"""
         t.type = reserved.get(t.value, 'IDENTIFIER')
-        if t.type == 'BOOLEAN':
-            t.value = True if t.value == 'true' else False
         return t
 
     def t_newline(t):

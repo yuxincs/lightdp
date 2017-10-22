@@ -2,62 +2,31 @@ import pytest
 from lightdp.lexer import build_lexer
 
 
-def test_function_declaration():
+def test_precondition():
     lexer = build_lexer()
-    lexer.input('function SparseVector(T, N, epsilon : num(0); q : list num(*))')
+    lexer.input('precondition(q[i] >= -1 and q[i] <= 1);')
     tokens = [(t.type, t.value) for t in lexer]
-    assert tokens == [('FUNCTION', 'function'), ('IDENTIFIER', 'SparseVector'), ('(', '('),
-                      ('IDENTIFIER', 'T'), (',', ','), ('IDENTIFIER', 'N'), (',', ','),
-                      ('IDENTIFIER', 'epsilon'), (':', ':'), ('NUM_TYPE', 'num'), ('(', '('),
-                      ('REAL', 0.0), (')', ')'), (';', ';'), ('IDENTIFIER', 'q'), (':', ':'),
-                      ('LIST_TYPE', 'list'), ('NUM_TYPE', 'num'), ('(', '('),  ('*', '*'),
-                      (')', ')'), (')', ')')]
+    assert tokens == [('PRECONDITION', 'precondition'), ('EXPRESSION', 'q[i] >= -1 and q[i] <= 1'), (';', ';')]
 
 
-def test_variable_declaration():
+def test_type_declaration():
     lexer = build_lexer()
-    lexer.input('a := 1;b := 2; c := 3;')
+    lexer.input('T : num(0); a, b : num(*); c : list bool; d: list num(0);')
     tokens = [(t.type, t.value) for t in lexer]
-    assert tokens == [('IDENTIFIER', 'a'), ('ASSIGN', ':='), ('REAL', 1.0), (';', ';'),
-                      ('IDENTIFIER', 'b'), ('ASSIGN', ':='), ('REAL', 2.0), (';', ';'),
-                      ('IDENTIFIER', 'c'), ('ASSIGN', ':='), ('REAL', 3.0), (';', ';')]
-
-
-def test_if_else():
-    lexer = build_lexer()
-    lexer.input('if(a >= T)\n{ out := true::out; }\nelse{\nout := false::out;}')
-    tokens = [(t.type, t.value) for t in lexer]
-    assert tokens == [('IF', 'if'), ('(', '('), ('IDENTIFIER', 'a'), ('GE', '>='), ('IDENTIFIER', 'T'),
-                      (')', ')'), ('{', '{'), ('IDENTIFIER', 'out'), ('ASSIGN', ':='),
-                      ('BOOLEAN', True), ('CONS', '::'), ('IDENTIFIER', 'out'), (';', ';'),
-                      ('}', '}'), ('ELSE', 'else'), ('{', '{'), ('IDENTIFIER', 'out'),
-                      ('ASSIGN', ':='), ('BOOLEAN', False), ('CONS', '::'), ('IDENTIFIER', 'out'),
-                      (';', ';'), ('}', '}')]
-
-
-def test_not():
-    lexer = build_lexer()
-    lexer.input('if(!T)')
-    tokens = [(t.type, t.value) for t in lexer]
-    assert tokens == [('IF', 'if'), ('(', '('), ('!', '!'), ('IDENTIFIER', 'T'), (')', ')')]
-
-
-def test_question():
-    lexer = build_lexer()
-    lexer.input('a ? b : c;')
-    tokens = [(t.type, t.value) for t in lexer]
-    assert tokens == [('IDENTIFIER', 'a'), ('?', '?'), ('IDENTIFIER', 'b'), (':', ':'),
-                      ('IDENTIFIER', 'c'), (';', ';')]
+    assert tokens == [('IDENTIFIER', 'T'), (':', ':'), ('NUM_TYPE', 'num'), ('EXPRESSION', '0'), (';', ';'),
+                      ('IDENTIFIER', 'a'), (',', ','), ('IDENTIFIER', 'b'), (':', ':'), ('NUM_TYPE', 'num'), ('*', '*'), (';', ';'),
+                      ('IDENTIFIER', 'c'), (':', ':'), ('LIST_TYPE', 'list'), ('BOOL_TYPE', 'bool'), (';', ';'),
+                      ('IDENTIFIER', 'd'), (':', ':'), ('LIST_TYPE', 'list'), ('NUM_TYPE', 'num'), ('EXPRESSION', '0'), (';', ';')]
 
 
 def test_lineno():
     lexer = build_lexer()
-    lexer.input('a := 1;\nb := 2;')
+    lexer.input('precondition(1 > 2);\nT : num(0);')
     tokens = [t for t in lexer]
     assert lexer.lineno == 2
     # reset line counter
     lexer.lineno = 1
-    lexer.input('a := 1;\nb := 2;\n c := 3;\n\n\n')
+    lexer.input('T : num(0);\nT : num(0);\nT : num(0);\n\n\n')
     tokens = [t for t in lexer]
     assert lexer.lineno == 6
 
@@ -71,11 +40,3 @@ def test_illegal_character():
     assert error.value.msg.lineno == 1
     assert error.value.msg.value == '~= 1;'
     assert error.value.msg.lexpos == 2
-
-
-def test_comment():
-    lexer = build_lexer()
-    lexer.input('a := 1; # b := 2;\nc := 3;')
-    tokens = [(t.type, t.value) for t in lexer]
-    assert tokens == [('IDENTIFIER', 'a'), ('ASSIGN', ':='), ('REAL', 1.0), (';', ';'),
-                      ('IDENTIFIER', 'c'), ('ASSIGN', ':='), ('REAL', 3.0), (';', ';')]
