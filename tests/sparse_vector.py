@@ -5,7 +5,7 @@ def SparseVector(T, N, len, epsilon, q):
     """
     precondition(q[i] >= -1 and q[i] <= 1);
     T, N, len, epsilon : num(0); q : list num(*); out : list bool;
-    c1, c2, i : num(0); T_threshold, eta_1 : num(1); eta_2 : num(q[i]+eta_2>=T_threshold ? 2:0)
+    c1, c2, i : num(0); T_threshold, eta_1 : num(1); eta_2 : num(2 if q[i]+eta_2>=T_threshold else 0)
     """
     out = []
     eta_1 = lightdp.distributions.sample('Lap')(2 / epsilon)
