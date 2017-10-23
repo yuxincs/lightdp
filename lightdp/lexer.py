@@ -44,6 +44,7 @@ def build_lexer():
             else:
                 t.type = 'EXPRESSION'
                 t.lexer.lineno += t.value.count('\n')
+                t.value.replace('\n', '')
             t.lexer.begin('INITIAL')
             return t
 
