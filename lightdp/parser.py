@@ -51,14 +51,10 @@ def build_parser():
         if len(p) == 2:
             p[0] = Type(p[1], None)
         elif len(p) == 3:
-            try:
-                basestring
-            except NameError:
-                basestring = str
-            if isinstance(p[2], basestring):
-                p[0] = Type(p[1], ast.parse(p[2]))
-            else:
+            if isinstance(p[2], Type) or p[2] == '*':
                 p[0] = Type(p[1], p[2])
+            else:
+                p[0] = Type(p[1], ast.parse(p[2]))
         elif len(p) == 4:
             p[0] = Type(p[1], p[2])
 
