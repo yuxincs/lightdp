@@ -5,7 +5,7 @@ More details can be found [here](http://www.cse.psu.edu/~dbz5017/pub/popl17.pdf)
 
 This project presents a tool for transforming LightDP programs into Python programs along with differential-privacy proofs.
 
-# Usage
+# Install
 
 To install it, run
 
@@ -13,7 +13,11 @@ To install it, run
 $ python setup.py install
 ```
 
-Then to transform LightDP program `source.ldp` to `output.py`, run
+This project requires `pySMT` and a backend SMT solver to verify the program. Refer to [`pySMT` on github](http://www.pysmt.org) to learn about SMT solver and install a solver backend. 
+
+# Usage
+
+To transform LightDP program `source.ldp` to `output.py`, run
 
 ```bash
 $ lightdp source.ldp -o output.py
