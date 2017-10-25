@@ -13,9 +13,9 @@ def SparseVector(T, N, len, epsilon, q):
     c1 = 0
     c2 = 0
     i = 0
-    while (c1 < N) and (i < len):
+    while c1 < N and i < len:
         eta_2 = lightdp.distributions.sample('Lap')(4 * N/epsilon)
-        if ((q[i]) + eta_2) >= T_threshold:
+        if q[i] + eta_2 >= T_threshold:
             out = (out + [True])
             c1 = c1 + 1
         else:
