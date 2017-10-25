@@ -29,7 +29,7 @@ setup(
     ],
     keywords='Programming Language, Differential Privacy',
     packages=find_packages(exclude=['tests']),
-    install_requires=['ply', 'numpy', 'jsonpickle', 'pysmt'],
+    install_requires=['ply', 'numpy', 'jsonpickle', 'pysmt', 'scipy'],
     extras_requires={
         'test': ['pytest-cov', 'pytest', 'coverage'],
     },
