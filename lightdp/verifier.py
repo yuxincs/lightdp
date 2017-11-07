@@ -1,15 +1,8 @@
 import ast
 import _ast
-from pysmt.shortcuts import Symbol, GE, LE, LT, GT, Equals, Not
-from lightdp.typing import Type
+import pysmt.shortcuts as shortcuts
+#from lightdp.typing import Type
 
-_dot_operation_map = {
-    ast.Eq: Equals,
-    ast.Not: Not,
-    ast.Gt: GT,
-    ast.Lt: LT,
-    ast.LtE: LE,
-    ast.GtE: GE
 dot_operation_map = {
     ast.Eq: shortcuts.Equals,
     ast.Not: shortcuts.Not,
