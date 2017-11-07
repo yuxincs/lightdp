@@ -15,11 +15,11 @@ def build_parser():
     )
 
     def p_annotation(p):
-        """annotation : PRECONDITION EXPRESSION ';' type_declarations"""
+        r"""annotation : PRECONDITION EXPRESSION ';' type_declarations"""
         p[0] = (ast.parse(p[2]), p[4])
 
     def p_type_declarations(p):
-        """type_declarations : type_declarations ';' type_declaration
+        r"""type_declarations : type_declarations ';' type_declaration
                              | type_declaration"""
         # merge the type_map
         type_map = {} if len(p) == 2 else p[1]
@@ -30,11 +30,11 @@ def build_parser():
         p[0] = type_map
 
     def p_type_declaration(p):
-        """type_declaration : var_list ':' type"""
+        r"""type_declaration : var_list ':' type"""
         p[0] = (p[1], p[3])
 
     def p_var_list(p):
-        """var_list : var_list ',' IDENTIFIER
+        r"""var_list : var_list ',' IDENTIFIER
                     | IDENTIFIER"""
         if isinstance(p[1], list):
             p[1].append(p[3])
@@ -43,7 +43,7 @@ def build_parser():
             p[0] = [p[1]]
 
     def p_type(p):
-        """type : BOOL_TYPE
+        r"""type : BOOL_TYPE
                 | NUM_TYPE EXPRESSION
                 | NUM_TYPE '*'
                 | LIST_TYPE type
