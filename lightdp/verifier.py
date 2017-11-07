@@ -55,16 +55,6 @@ class NodeVerifier(ast.NodeVisitor):
             if target.id in self.__environments[len(self.__environments) - 1][1]:
                 print(type(node.value))
 
-    def visit_Num(self, node):
-        return Type('num', ast.parse('0'))
-
-    def visit_BinOp(self, node):
-        if isinstance(node.op, _dot_operation_map.keys()):
-            pass
-        elif isinstance(node.op, ast.):
-            pass
-        #elif node.op
-
 
 def verify(tree):
     assert isinstance(tree, _ast.AST)
