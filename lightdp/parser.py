@@ -3,7 +3,8 @@ def build_parser():
     Build a ply.parser for parsing LightDP
     :return: ply parser
     """
-    from lightdp.typing import Type
+    from lightdp.typing import NumType, ListType, BoolType, FunctionType
+    from lightdp.verifier import ExpressionVerifier
     import ply.yacc as yacc
     import ast
 
@@ -42,21 +43,23 @@ def build_parser():
             p[0] = [p[1]]
 
     def p_type(p):
-        """type : NUM_TYPE EXPRESSION
+        """type : BOOL_TYPE
+                | NUM_TYPE EXPRESSION
                 | NUM_TYPE '*'
-                | BOOL_TYPE
                 | LIST_TYPE type
                 | type TO type"""
 
         if len(p) == 2:
-            p[0] = Type(p[1], None)
+            p[0] = BoolType()
         elif len(p) == 3:
-            if isinstance(p[2], Type) or p[2] == '*':
-                p[0] = Type(p[1], p[2])
+            if isinstance(p[2], (ListType, NumType, FunctionType, BoolType)):
+                p[0] = ListType(p[2])
+            elif p[2] == '*':
+                p[0] = NumType('*')
             else:
-                p[0] = Type(p[1], ast.parse(p[2]))
+                p[0] = NumType(ExpressionVerifier().visit(ast.parse(p[2])))
         elif len(p) == 4:
-            p[0] = Type(p[1], p[2])
+            p[0] = FunctionType(p[1], p[2])
 
     def p_error(p):
         print('Error at %s' % p)
