@@ -10,7 +10,25 @@ _dot_operation_map = {
     ast.Lt: LT,
     ast.LtE: LE,
     ast.GtE: GE
+dot_operation_map = {
+    ast.Eq: shortcuts.Equals,
+    ast.Not: shortcuts.Not,
+    ast.Gt: shortcuts.GT,
+    ast.Lt: shortcuts.LT,
+    ast.LtE: shortcuts.LE,
+    ast.GtE: shortcuts.GE
 }
+
+oplus_operation_map = {
+    ast.Add: shortcuts.Plus,
+    ast.Sub: shortcuts.Minus
+}
+
+otimes_operation_map = {
+    ast.Mult: shortcuts.Times,
+    ast.Div: shortcuts.Div
+}
+
 
 class NodeVerifier(ast.NodeVisitor):
     def __init__(self):
