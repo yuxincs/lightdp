@@ -1,7 +1,7 @@
 import ast
 import _ast
 from pysmt.shortcuts import Symbol, GE, LE, LT, GT, Equals, Not
-from lightdp.type import Type
+from lightdp.typing import Type
 
 _dot_operation_map = {
     ast.Eq: Equals,

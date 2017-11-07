@@ -3,7 +3,7 @@ def build_parser():
     Build a ply.parser for parsing LightDP
     :return: ply parser
     """
-    from lightdp.type import Type
+    from lightdp.typing import Type
     import ply.yacc as yacc
     import ast
 
