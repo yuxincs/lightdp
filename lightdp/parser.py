@@ -9,41 +9,6 @@ def build_parser():
     import ply.yacc as yacc
     import ast
 
-    class ExpressionParser(ast.NodeVisitor):
-        def __init__(self, type_map):
-            self.type_map = type_map
-
-        def visit_Module(self, node):
-            assert isinstance(node.body[0], ast.Expr)
-            super(ExpressionParser, self).generic_visit(node.body[0])
-
-        def visit_IfExp(self, node):
-            return shortcuts.Ite(self.visit(node.test), self.visit(node.body), self.visit(node.orelse))
-
-        def visit_Compare(self, node):
-            assert len(node.ops) == 1 and len(node.comparators), "Only allow one comparators in binary operations."
-            return dot_operation_map[node.ops[0].__class__](self.visit(node.left), self.visit(node.comparators[0]))
-
-        def visit_Name(self, node):
-            assert node.id in self.type_map, "%s not defined." % node.id
-            return self.type_map[node.id][0]
-
-        def visit_Num(self, node):
-            return shortcuts.Int(node.n) if isinstance(node.n, int) else shortcuts.Real(node.n)
-
-        def visit_BinOp(self, node):
-            if isinstance(node.op, tuple(oplus_operation_map.keys())):
-                return oplus_operation_map[node.op.__class__](self.visit(node.left), self.visit(node.right))
-            elif isinstance(node.op, tuple(otimes_operation_map.keys())):
-                return otimes_operation_map[node.op.__class__](self.visit(node.left), self.visit(node.right))
-
-        def visit_Subscript(self, node):
-            assert isinstance(node.slice, ast.Index), "Only index is supported."
-            shortcuts.Select(self.visit(node.value), self.visit(node.slice.value))
-
-        def generic_visit(self, node):
-            assert False, 'Unexpeted node %s' % ast.dump(node)
-
     from lightdp.lexer import tokens
 
     precedence = (
@@ -52,7 +17,7 @@ def build_parser():
 
     def p_annotation(p):
         r"""annotation : PRECONDITION EXPRESSION ';' type_declarations"""
-        p[0] = (ast.parse(p[2]), p[4])
+        p[0] = (p[2], p[4])
 
     def p_type_declarations(p):
         r"""type_declarations : type_declarations ';' type_declaration
@@ -60,7 +25,8 @@ def build_parser():
         declaration = p[1] if len(p) == 2 else p[3]
 
         for var in declaration[0]:
-            p.parser.type_map[var] = (shortcuts.Symbol(var, to_smt_type(declaration[1])), declaration[1])
+            p.parser.type_map[var] = declaration[1]
+
         p[0] = p.parser.type_map
 
     def p_type_declaration(p):
@@ -91,7 +57,7 @@ def build_parser():
             elif p[2] == '*':
                 p[0] = NumType('*')
             else:
-                p[0] = NumType(ExpressionParser(p.parser.type_map).visit(ast.parse(p[2])))
+                p[0] = NumType(p[2])
         elif len(p) == 4:
             p[0] = FunctionType(p[1], p[2])
 
