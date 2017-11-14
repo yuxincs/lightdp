@@ -56,7 +56,7 @@ def build_lexer():
         t_error(t)
 
     def t_IDENTIFIER(t):
-        r"""[_a-zA-Z]([0-9]|[a-zA-Z]|_)*"""
+        r"""[\^_a-zA-Z]([0-9]|[a-zA-Z]|_)*"""
         t.type = reserved.get(t.value, 'IDENTIFIER')
         return t
 
