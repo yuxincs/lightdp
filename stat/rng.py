@@ -1,8 +1,8 @@
-import numpy
-from scipy import stats
+#import numpy
+#from scipy import stats
 
 
-class LightdpStat:
+class Rng(object):
 
     def __init__(self):
         self.weight = 1
@@ -15,6 +15,7 @@ class LightdpStat:
         self.weight = w
 
     def laplace(self, eps, x):
+        # type: (object, object) -> object
         s = 1/float(eps)
         rng = numpy.random.laplace(scale=s) + x
         self.weight *= stats.laplace.pdf(rng, 0, s) / self.base_distr.pdf(rng, 0, s)
@@ -27,6 +28,7 @@ class LightdpStat:
         return rng
 
 
+prng = Rng()
 
 
-# Test
+print prng.laplace(1,0)
