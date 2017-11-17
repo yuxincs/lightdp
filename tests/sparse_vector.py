@@ -13,10 +13,10 @@ def SparseVector(T, N, len, epsilon, q):
     while c1 < N and i < len:
         eta_2 = Laplace(4 * N/epsilon)
         if q[i] + eta_2 >= T_threshold:
-            out = (out + [True])
+            out.append(True)
             c1 = c1 + 1
         else:
-            out = (out + [False])
+            out.append(False)
             c2 = c2 + 1
         i = i + 1
     return out
