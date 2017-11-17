@@ -1,6 +1,3 @@
-import lightdp
-
-
 def SparseVector(T, N, len, epsilon, q):
     """
     precondition(^q[i] >= -1 and ^q[i] <= 1);
