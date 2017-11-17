@@ -3,11 +3,8 @@ def build_parser():
     Build a ply.parser for parsing LightDP
     :return: ply parser
     """
-    from lightdp.typing import NumType, ListType, BoolType, FunctionType, to_smt_type
-    from lightdp.verifier import dot_operation_map, oplus_operation_map, otimes_operation_map
-    import pysmt.shortcuts as shortcuts
+    from lightdp.typing import NumType, ListType, BoolType, FunctionType
     import ply.yacc as yacc
-    import ast
 
     from lightdp.lexer import tokens
 
