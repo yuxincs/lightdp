@@ -214,5 +214,17 @@ def verify(tree):
             from pysmt.printers import HRPrinter
             import sys
             printer = HRPrinter(sys.stdout)
+
+            print('\033[32;1mPrecondition:\033[0m')
+            sys.stdout.write('\t')
+            printer.printer(constraints[0])
+            sys.stdout.write('\n')
+            print('\033[32;1mConstraints:\033[0m')
+            for constraint in constraints[1:]:
+                sys.stdout.write('\t')
+                printer.printer(constraint)
+                sys.stdout.write('\n')
+            print('\033[32;1mFinal Constraint:\033[0m')
             printer.printer(final_constraints)
+            sys.stdout.write('\n')
             return shortcuts.is_sat(final_constraints)
