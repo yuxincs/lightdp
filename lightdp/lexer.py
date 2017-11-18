@@ -24,17 +24,17 @@ def build_lexer():
     )
 
     def t_expression(t):
-        """\("""
+        r"""\("""
         t.lexer.expression_start = t.lexer.lexpos
         t.lexer.level = 1
         t.lexer.begin('expression')
 
     def t_expression_lbrace(t):
-        """\("""
+        r"""\("""
         t.lexer.level += 1
 
     def t_expression_rbrace(t):
-        """\)"""
+        r"""\)"""
         t.lexer.level -= 1
 
         if t.lexer.level == 0:
@@ -49,14 +49,14 @@ def build_lexer():
             return t
 
     def t_expression_content(t):
-        """[^\(\)]"""
+        r"""[^\(\)]"""
         pass
 
     def t_expression_error(t):
         t_error(t)
 
     def t_IDENTIFIER(t):
-        """[_a-zA-Z]([0-9]|[a-zA-Z]|_)*"""
+        r"""[\^_a-zA-Z]([0-9]|[a-zA-Z]|_)*"""
         t.type = reserved.get(t.value, 'IDENTIFIER')
         return t
 
