@@ -5,7 +5,6 @@ from lightdp import verifier, transformer
 
 def main():
     import argparse
-    import json
     import astunparse
 
     arg_parser = argparse.ArgumentParser(description=__doc__)
@@ -18,12 +17,6 @@ def main():
                             help='The configuration file name.', required=False)
 
     results = arg_parser.parse_args()
-
-    # open the config file if present
-    config = None
-    if results.config is not None:
-        with open(results.config, 'r') as f:
-            config = json.loads(f.read())
 
     all_parse_trees = []
     for file in results.files:
