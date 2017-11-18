@@ -57,4 +57,16 @@ class NodeTransformer(ast.NodeTransformer):
 
 
 def transform(node):
-    return NodeTransformer().visit(node)
+    final_ast = []
+    transformer = NodeTransformer()
+    if isinstance(node, list):
+        final_ast.append(transformer.visit(node[0]))
+        for n in node[1:]:
+            ast = transformer.visit(n)
+            if isinstance(ast, ast.Module):
+                # trim the 'def havoc(scale): pass' code for the rest
+                ast.body = ast.body[1:]
+            final_ast.append(ast)
+    else:
+        final_ast.append(transformer.visit(node))
+    return final_ast
