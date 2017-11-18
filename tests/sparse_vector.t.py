@@ -23,4 +23,4 @@ def SparseVector(T, N, len, epsilon, q):
             out.append(False)
             c2 = (c2 + 1)
         i = (i + 1)
-    return ((out, c1), __V_epsilon)
+    return (out, __V_epsilon)
