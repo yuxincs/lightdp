@@ -39,6 +39,10 @@ class NodeTransformer(ast.NodeTransformer):
         else:
             return node
 
+    def visit_Return(self, node):
+            node.value = ast.Tuple(elts=[node.value, ast.Name(id='__V_epsilon', ctx=ast.Load())], ctx=ast.Load())
+            return node
+
     def generic_visit(self, node):
         new_node = super(NodeTransformer, self).generic_visit(node)
         if hasattr(new_node, 'body') and isinstance(new_node.body, (tuple, list)):
