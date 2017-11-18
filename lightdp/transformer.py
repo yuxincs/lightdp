@@ -17,8 +17,6 @@ class NodeTransformer(ast.NodeTransformer):
                                                 body=[ast.Expr(value=ast.Str('Implement the havoc instruction here')),
                                                       ast.Pass()]
                                                 ))
-        import astunparse
-        print(astunparse.dump(new_node))
         return new_node
 
     def visit_FunctionDef(self, node):
