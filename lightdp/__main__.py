@@ -30,7 +30,7 @@ def main():
             transformed = transformer.transform(tree)
             if results.out is None:
                 # write the transformed program to the output file
-                with open(file[0:results.files[0].rfind('.')] + '.t.py', 'w') as out:
+                with open(file[0:results.files[0].rfind('.')] + '_t.py', 'w') as out:
                     out.write(astunparse.unparse(transformed))
             else:
                 all_parse_trees.append(transformed)
