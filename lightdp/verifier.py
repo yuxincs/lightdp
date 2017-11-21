@@ -3,6 +3,7 @@ import _ast
 import re
 import pysmt.shortcuts as shortcuts
 from lightdp.typing import *
+import z3
 
 dot_operation_map = {
     ast.Eq: shortcuts.Equals,
@@ -138,14 +139,16 @@ class NodeVerifier(ast.NodeVisitor):
                     # TODO: consider list inside list
                     self.__type_map['^' + name] = ListType(NumType(0))
                     if isinstance(var_type.elem_type, NumType) and var_type.elem_type.value != '*':
-                        constraint = shortcuts.Equals(
-                            shortcuts.Select(shortcuts.Symbol('^' + name, to_smt_type(ListType(NumType(0)))), shortcuts.Symbol('i', shortcuts.REAL)),
-                            ExpressionTranslator(self.__type_map).visit(ast.parse(var_type.elem_type.value)))
+                        symbol_i = shortcuts.Symbol('i', shortcuts.REAL)
+                        constraint = shortcuts.ForAll([symbol_i],
+                                                      shortcuts.Equals(
+                            shortcuts.Select(shortcuts.Symbol('^' + name, to_smt_type(ListType(NumType(0)))), symbol_i),
+                            ExpressionTranslator(self.__type_map).visit(ast.parse(var_type.elem_type.value))))
                     elif isinstance(var_type.elem_type, BoolType):
-                        constraint = shortcuts.Equals(
-                            shortcuts.Select(shortcuts.Symbol('^' + name, to_smt_type(ListType(NumType(0)))),
-                                             shortcuts.Symbol('i', shortcuts.REAL)),
-                            ExpressionTranslator(self.__type_map).visit(ast.parse('0')))
+                        symbol_i = shortcuts.Symbol('i', shortcuts.REAL)
+                        constraint = shortcuts.ForAll([symbol_i], shortcuts.Equals(
+                            shortcuts.Select(shortcuts.Symbol('^' + name, to_smt_type(ListType(NumType(0)))), symbol_i),
+                            ExpressionTranslator(self.__type_map).visit(ast.parse('0'))))
                 if constraint is not None:
                     self.__constraints.append(constraint)
             self.generic_visit(node)
