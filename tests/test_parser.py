@@ -2,6 +2,17 @@ from lightdp.lexer import build_lexer
 from lightdp.parser import build_parser
 import jsonpickle
 
+def test_precondition():
+    docstring = \
+        """
+        precondition : forall i (^q[i] >= -1 and ^q[i] <= 1);
+        A : num(0)
+        """
+    lexer = build_lexer()
+    parser = build_parser()
+    forall_var, precondition, type_map = parser.parse(docstring, lexer=lexer)
+    print(forall_var)
+
 
 def test_parser():
     docstring = \
