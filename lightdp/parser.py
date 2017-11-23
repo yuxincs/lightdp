@@ -13,8 +13,12 @@ def build_parser():
     )
 
     def p_annotation(p):
-        r"""annotation : PRECONDITION EXPRESSION ';' type_declarations"""
-        p[0] = (p[2], p[4])
+        r"""annotation : PRECONDITION ':' EXPRESSION ';' type_declarations
+                       | PRECONDITION ':' FORALL var_list EXPRESSION ';' type_declarations"""
+        if len(p) == 6:
+            p[0] = (None, p[3], p[5])
+        elif len(p) == 8:
+            p[0] = (p[4], p[5], p[7])
 
     def p_type_declarations(p):
         r"""type_declarations : type_declarations ';' type_declaration
