@@ -7,8 +7,6 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
-  - "pypy3"
-  - "nightly"
 
 install:
   - pip install -r requirements-dev.txt
@@ -26,7 +24,7 @@ script:
 jobs:
   include:
     - stage: codecov
-      python: nightly
+      python: 3.6
       script:
         - tox
         - pip install codecov && codecov --token=$CODECOV_TOKEN
