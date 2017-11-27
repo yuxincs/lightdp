@@ -4,9 +4,18 @@ from lightdp.lexer import build_lexer
 
 def test_precondition():
     lexer = build_lexer()
-    lexer.input('precondition(q[i] >= -1 and q[i] <= 1);')
+    lexer.input('precondition : (q[i] >= -1 and q[i] <= 1);')
     tokens = [(t.type, t.value) for t in lexer]
-    assert tokens == [('PRECONDITION', 'precondition'), ('EXPRESSION', 'q[i] >= -1 and q[i] <= 1'), (';', ';')]
+    assert tokens == [('PRECONDITION', 'precondition'), (':', ':'), ('EXPRESSION', 'q[i] >= -1 and q[i] <= 1'),
+                      (';', ';')]
+
+
+def test_precondition_with_forall():
+    lexer = build_lexer()
+    lexer.input('precondition : forall i (q[i] >= -1 and q[i] <= 1);')
+    tokens = [(t.type, t.value) for t in lexer]
+    assert tokens == [('PRECONDITION', 'precondition'), (':', ':'), ('FORALL', 'forall'), ('IDENTIFIER', 'i'),
+                      ('EXPRESSION', 'q[i] >= -1 and q[i] <= 1'), (';', ';')]
 
 
 def test_type_declaration():

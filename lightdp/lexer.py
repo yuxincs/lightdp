@@ -2,7 +2,8 @@ reserved = {
         'num': 'NUM_TYPE',
         'bool': 'BOOL_TYPE',
         'list': 'LIST_TYPE',
-        'precondition': 'PRECONDITION'
+        'precondition': 'PRECONDITION',
+        'forall': 'FORALL'
     }
 
 tokens = ['IDENTIFIER', 'EXPRESSION', 'TO'] + list(set(reserved.values()))
