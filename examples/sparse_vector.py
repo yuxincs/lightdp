@@ -1,6 +1,6 @@
 def SparseVector(T, N, len, epsilon, q):
     """
-    precondition : forall i (^q[i] >= -1 and ^q[i] <= 1 and ^out[i] == 0);
+    precondition : forall i (^q[i] >= -1 and ^q[i] <= 1);
     T, N, len, epsilon : num(0); q : list num(*); out : list bool;
     c1, c2, i : num(0); T_threshold, eta_1 : num(1); eta_2 : num(2 if q[i] + eta_2 >= T_threshold else 0)
     """

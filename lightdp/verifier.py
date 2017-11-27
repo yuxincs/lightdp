@@ -3,6 +3,7 @@ import _ast
 import re
 import pysmt.shortcuts as shortcuts
 from lightdp.typing import *
+import z3
 
 dot_operation_map = {
     ast.Eq: shortcuts.Equals,
@@ -118,15 +119,37 @@ class NodeVerifier(ast.NodeVisitor):
                     shortcuts.ForAll([shortcuts.Symbol(var, shortcuts.REAL) for var in forall_vars], ExpressionTranslator(self.__type_map, set(res)).visit(ast.parse(precondition.replace('^', '')))))
 
             for name, var_type in dict(self.__type_map).items():
-                if not name[0] == '^' and isinstance(var_type, NumType):
-                    if isinstance(self.__type_map[name], (NumType, BoolType, FunctionType)):
-                        self.__type_map['^' + name] = NumType(0)
-                    elif isinstance(self.__type_map[name[1:]], ListType):
-                        self.__type_map['^' + name] = ListType(NumType(0))
-
-                    constraint = shortcuts.Equals(shortcuts.Symbol('^' + name, to_smt_type(self.__type_map['^' + name])),
-                                                  ExpressionTranslator(self.__type_map).visit(ast.parse(var_type.value)))
-
+                if name[0] == '^':
+                    continue
+                constraint = None
+                if isinstance(var_type, NumType):
+                    self.__type_map['^' + name] = NumType(0)
+                    constraint = shortcuts.Equals(
+                        shortcuts.Symbol('^' + name, to_smt_type(NumType(0))),
+                        ExpressionTranslator(self.__type_map).visit(ast.parse(var_type.value)))
+                elif isinstance(var_type, BoolType):
+                    self.__type_map['^' + name] = NumType(0)
+                    constraint = shortcuts.Equals(
+                        shortcuts.Symbol('^' + name, to_smt_type(NumType(0))),
+                        ExpressionTranslator(self.__type_map).visit(ast.parse('0')))
+                elif isinstance(var_type, FunctionType):
+                    # TODO: consider FunctionType
+                    pass
+                elif isinstance(var_type, ListType):
+                    # TODO: consider list inside list
+                    self.__type_map['^' + name] = ListType(NumType(0))
+                    if isinstance(var_type.elem_type, NumType) and var_type.elem_type.value != '*':
+                        symbol_i = shortcuts.Symbol('i', shortcuts.REAL)
+                        constraint = shortcuts.ForAll([symbol_i],
+                                                      shortcuts.Equals(
+                            shortcuts.Select(shortcuts.Symbol('^' + name, to_smt_type(ListType(NumType(0)))), symbol_i),
+                            ExpressionTranslator(self.__type_map).visit(ast.parse(var_type.elem_type.value))))
+                    elif isinstance(var_type.elem_type, BoolType):
+                        symbol_i = shortcuts.Symbol('i', shortcuts.REAL)
+                        constraint = shortcuts.ForAll([symbol_i], shortcuts.Equals(
+                            shortcuts.Select(shortcuts.Symbol('^' + name, to_smt_type(ListType(NumType(0)))), symbol_i),
+                            ExpressionTranslator(self.__type_map).visit(ast.parse('0'))))
+                if constraint is not None:
                     self.__constraints.append(constraint)
             self.generic_visit(node)
 
