@@ -108,9 +108,14 @@ class NodeVerifier(ast.NodeVisitor):
     def visit_FunctionDef(self, node):
         annotation = NodeVerifier.parse_docstring(ast.get_docstring(node))
         if annotation is not None:
-            precondition, self.__type_map = annotation
+            forall_vars, precondition, self.__type_map = annotation
             res = re.findall(r"""\^([_a-zA-Z][0-9a-zA-Z_]*)""", precondition)
-            self.__constraints.append(ExpressionTranslator(self.__type_map, set(res)).visit(ast.parse(precondition.replace('^', ''))))
+
+            if forall_vars is None:
+                self.__constraints.append(ExpressionTranslator(self.__type_map, set(res)).visit(ast.parse(precondition.replace('^', ''))))
+            else:
+                self.__constraints.append(
+                    shortcuts.ForAll([shortcuts.Symbol(var, shortcuts.REAL) for var in forall_vars], ExpressionTranslator(self.__type_map, set(res)).visit(ast.parse(precondition.replace('^', '')))))
 
             for name, var_type in dict(self.__type_map).items():
                 if not name[0] == '^' and isinstance(var_type, NumType):
