@@ -5,6 +5,12 @@ import nm
 
 prng = sampler.Sampler('normal')
 
+prng2 = sampler.Sampler('laplace')
+
+print (prng2.laplace(0,1))
+
+print (prng2.normal(0,1))
+
 print (gauss.mech(1,0,prng))
 
 print (prng.weight)
