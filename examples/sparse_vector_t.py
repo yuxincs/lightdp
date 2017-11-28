@@ -1,8 +1,11 @@
+import lightdp.lightstat.sampler as sampler
+
+prng = sampler.Sampler('laplace')
 
 
-def havoc(scale):
-    'Implement the havoc instruction here'
-    pass
+def havoc(s):
+    return prng.laplace(scale = s)
+
 
 def SparseVector(T, N, len, epsilon, q):
     __V_epsilon = 0
@@ -24,3 +27,5 @@ def SparseVector(T, N, len, epsilon, q):
             c2 = (c2 + 1)
         i = (i + 1)
     return (out, __V_epsilon)
+
+print(SparseVector(5, 5, 4, 1, [1,2,3,4]))
