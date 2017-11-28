@@ -1,36 +1,35 @@
 import ast
 import _ast
 import re
-import pysmt.shortcuts as shortcuts
 from lightdp.typing import *
 import z3
 
 dot_operation_map = {
-    ast.Eq: shortcuts.Equals,
-    ast.Not: shortcuts.Not,
-    ast.Gt: shortcuts.GT,
-    ast.Lt: shortcuts.LT,
-    ast.LtE: shortcuts.LE,
-    ast.GtE: shortcuts.GE
+    ast.Eq: lambda x, y: x == y,
+    ast.Not: lambda x: z3.Not(x),
+    ast.Gt: lambda x, y: x > y,
+    ast.Lt: lambda x, y: x < y,
+    ast.LtE: lambda x, y: x <= y,
+    ast.GtE: lambda x, y: x >= y
 }
 
 oplus_operation_map = {
-    ast.Add: shortcuts.Plus,
-    ast.Sub: shortcuts.Minus
+    ast.Add: lambda x, y: x + y,
+    ast.Sub: lambda x, y: x - y
 }
 
 otimes_operation_map = {
-    ast.Mult: shortcuts.Times,
-    ast.Div: shortcuts.Div
+    ast.Mult: lambda x, y: x * y,
+    ast.Div: lambda x, y: x / y
 }
 
 bool_operation_map = {
-    ast.And: shortcuts.And,
-    ast.Or: shortcuts.Or
+    ast.And: lambda x, y: z3.And(x, y),
+    ast.Or: lambda x, y: z3.Or(x, y)
 }
 
 unary_operation_map = {
-    ast.USub: lambda x: shortcuts.Minus(shortcuts.Real(0), x)
+    ast.USub: lambda x: -x
 }
 
 
