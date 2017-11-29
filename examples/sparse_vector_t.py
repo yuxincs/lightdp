@@ -1,6 +1,6 @@
-import lightdp.lightstat.sampler as sampler
+from lightdp.stats.sampler import Sampler
 
-prng = sampler.Sampler('laplace')
+prng = Sampler('laplace')
 
 
 def havoc(s):
