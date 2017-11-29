@@ -2,7 +2,7 @@ from lightdp.lexer import build_lexer
 from lightdp.parser import build_parser
 import jsonpickle
 
-def test_precondition():
+def test_forall_keyword():
     docstring = \
         """
         precondition : forall i (^q[i] >= -1 and ^q[i] <= 1);
@@ -11,7 +11,7 @@ def test_precondition():
     lexer = build_lexer()
     parser = build_parser()
     forall_var, precondition, type_map = parser.parse(docstring, lexer=lexer)
-    print(forall_var)
+    assert forall_var == ['i']
 
 
 def test_parser():
