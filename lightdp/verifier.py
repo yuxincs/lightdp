@@ -209,10 +209,11 @@ class NodeVerifier(ast.NodeVisitor):
             if isinstance(target_type, ListType):
                 # TODO: list assignment
                 pass
+                # raise NotImplementedError('List assignment not implemented.')
             else:
                 self.__constraints.append(self.visit(node.targets[0])[1] == self.visit(node.value)[1])
         else:
-            assert False, 'Currently don\'t support multiple assignment.'
+            raise NotImplementedError('Currently don\'t support multiple assignment.')
 
     def visit_NameConstant(self, node):
         assert node.value == True or node.value == False, 'Unsupported NameConstant %s' % str(node.value)
