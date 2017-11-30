@@ -21,10 +21,6 @@ $ python setup.py develop
 
 for dependencies installation without installing the program into system.
 
-This project requires `pySMT` and a backend SMT solver to verify the program. Refer to [`pySMT` on github](http://www.pysmt.org) to learn about SMT solver and install a solver backend.
-
-Typical installation will require `pysmt` package and use `pysmt-install` to install a backend. Remeber to use `pysmt-install --env` to get the environment statement and write into your `.rc` file
-
 # Usage
 
 The original python program 
