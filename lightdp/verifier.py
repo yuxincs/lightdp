@@ -62,7 +62,7 @@ class ExpressionTranslator(ast.NodeVisitor):
         return self.visit(node.value)
 
     def visit_IfExp(self, node):
-        return shortcuts.Ite(self.visit(node.test), self.visit(node.body), self.visit(node.orelse))
+        return z3.If(self.visit(node.test), self.visit(node.body), self.visit(node.orelse))
 
     def visit_Compare(self, node):
         assert len(node.ops) == 1 and len(node.comparators), "Only allow one comparators in binary operations."
@@ -77,18 +77,18 @@ class ExpressionTranslator(ast.NodeVisitor):
                 self.type_map[name] = NumType(0)
             elif isinstance(self.type_map[name[1:]], ListType):
                 self.type_map[name] = ListType(NumType(0))
-
-        return shortcuts.Symbol(name, to_smt_type(self.type_map[name]))
+        return _symbol(name, self.type_map[name])
 
     def visit_Num(self, node):
-        return shortcuts.Real(node.n)
+        return node.n
 
     def visit_BinOp(self, node):
         return _binop_map[node.op.__class__](self.visit(node.left), self.visit(node.right))
 
     def visit_Subscript(self, node):
-        assert isinstance(node.slice, ast.Index), "Only index is supported."
-        return shortcuts.Select(self.visit(node.value), self.visit(node.slice.value))
+        if not isinstance(node.slice, ast.Index):
+            raise NotImplementedError('Only one-dimension index is supported.')
+        return self.visit(node.value)[self.visit(node.slice.value)]
 
     def visit_BoolOp(self, node):
         from functools import reduce
@@ -124,10 +124,13 @@ class NodeVerifier(ast.NodeVisitor):
             res = re.findall(r"""\^([_a-zA-Z][0-9a-zA-Z_]*)""", precondition)
 
             if forall_vars is None:
-                self.__constraints.append(ExpressionTranslator(self.__type_map, set(res)).visit(ast.parse(precondition.replace('^', ''))))
+                self.__constraints.append(
+                    ExpressionTranslator(self.__type_map, set(res)).visit(ast.parse(precondition.replace('^', ''))))
             else:
                 self.__constraints.append(
-                    shortcuts.ForAll([shortcuts.Symbol(var, shortcuts.REAL) for var in forall_vars], ExpressionTranslator(self.__type_map, set(res)).visit(ast.parse(precondition.replace('^', '')))))
+                    z3.ForAll([_symbol(var, self.__type_map[var]) for var in forall_vars],
+                              ExpressionTranslator(self.__type_map, set(res)).visit(
+                                  ast.parse(precondition.replace('^', '')))))
 
             for name, var_type in dict(self.__type_map).items():
                 if name[0] == '^':
@@ -135,37 +138,32 @@ class NodeVerifier(ast.NodeVisitor):
                 constraint = None
                 if isinstance(var_type, NumType):
                     self.__type_map['^' + name] = NumType(0)
-                    constraint = shortcuts.Equals(
-                        shortcuts.Symbol('^' + name, to_smt_type(NumType(0))),
-                        ExpressionTranslator(self.__type_map).visit(ast.parse(var_type.value)))
+                    constraint = _symbol('^' + name, NumType(0)) == \
+                        ExpressionTranslator(self.__type_map).visit(ast.parse(var_type.value))
                 elif isinstance(var_type, BoolType):
                     self.__type_map['^' + name] = NumType(0)
-                    constraint = shortcuts.Equals(
-                        shortcuts.Symbol('^' + name, to_smt_type(NumType(0))),
-                        ExpressionTranslator(self.__type_map).visit(ast.parse('0')))
+                    constraint = _symbol('^' + name, NumType(0)) == \
+                        ExpressionTranslator(self.__type_map).visit(ast.parse('0'))
                 elif isinstance(var_type, FunctionType):
                     # TODO: consider FunctionType
                     pass
                 elif isinstance(var_type, ListType):
                     # TODO: consider list inside list
                     self.__type_map['^' + name] = ListType(NumType(0))
+                    symbol_i = _symbol('i', self.__type_map['i'])
                     if isinstance(var_type.elem_type, NumType) and var_type.elem_type.value != '*':
-                        symbol_i = shortcuts.Symbol('i', shortcuts.REAL)
-                        constraint = shortcuts.ForAll([symbol_i],
-                                                      shortcuts.Equals(
-                            shortcuts.Select(shortcuts.Symbol('^' + name, to_smt_type(ListType(NumType(0)))), symbol_i),
-                            ExpressionTranslator(self.__type_map).visit(ast.parse(var_type.elem_type.value))))
+                        constraint = z3.ForAll([symbol_i], _symbol('^' + name, ListType(NumType(0)))[symbol_i] ==
+                                               ExpressionTranslator(self.__type_map).visit(
+                                                   ast.parse(var_type.elem_type.value)))
                     elif isinstance(var_type.elem_type, BoolType):
-                        symbol_i = shortcuts.Symbol('i', shortcuts.REAL)
-                        constraint = shortcuts.ForAll([symbol_i], shortcuts.Equals(
-                            shortcuts.Select(shortcuts.Symbol('^' + name, to_smt_type(ListType(NumType(0)))), symbol_i),
-                            ExpressionTranslator(self.__type_map).visit(ast.parse('0'))))
+                        constraint = z3.ForAll([symbol_i], _symbol('^' + name, ListType(NumType(0)))[symbol_i] ==
+                                               ExpressionTranslator(self.__type_map).visit(ast.parse('0')))
                 if constraint is not None:
                     self.__constraints.append(constraint)
             self.generic_visit(node)
 
     def visit_If(self, node):
-        self.__constraints.append(shortcuts.Equals(self.visit(node.test)[0], self.visit(node.test)[1]))
+        self.__constraints.append(self.visit(node.test)[0] == self.visit(node.test)[1])
         self.generic_visit(node)
 
     def visit_Compare(self, node):
@@ -177,11 +175,10 @@ class NodeVerifier(ast.NodeVisitor):
 
     def visit_Name(self, node):
         assert node.id in self.__type_map, 'Undefined %s' % node.id
-        return (shortcuts.Symbol(node.id, to_smt_type(self.__type_map[node.id])),
-                shortcuts.Symbol('^' + node.id, to_smt_type(self.__type_map['^' + node.id])))
+        return _symbol(node.id, self.__type_map[node.id]), _symbol('^' + node.id, self.__type_map['^' + node.id])
 
     def visit_Num(self, node):
-        return shortcuts.Real(node.n), shortcuts.Real(0)
+        return node.n, 0
 
     def visit_BinOp(self, node):
         assert isinstance(node.op, tuple(_binop_map.keys())), 'Unsupported BinOp %s' % ast.dump(node.op)
@@ -189,9 +186,9 @@ class NodeVerifier(ast.NodeVisitor):
                 _binop_map[node.op.__class__](self.visit(node.left)[1], self.visit(node.right)[1]))
 
     def visit_Subscript(self, node):
-        assert isinstance(node.slice, ast.Index), "Only index is supported."
-        return (shortcuts.Select(self.visit(node.value)[0], self.visit(node.slice.value)[0]),
-                shortcuts.Select(self.visit(node.value)[1], self.visit(node.slice.value)[0]))
+        assert isinstance(node.slice, ast.Index), 'Only index is supported.'
+        return (self.visit(node.value)[0][self.visit(node.slice.value)[0]],
+                self.visit(node.value)[1][self.visit(node.slice.value)[0]])
 
     def visit_BoolOp(self, node):
         assert isinstance(node.op, tuple(_boolop_map.keys())), 'Unsupported BoolOp %s' % ast.dump(node.op)
@@ -213,7 +210,7 @@ class NodeVerifier(ast.NodeVisitor):
                 # TODO: list assignment
                 pass
             else:
-                self.__constraints.append(shortcuts.Equals(self.visit(node.targets[0])[1], self.visit(node.value)[1]))
+                self.__constraints.append(self.visit(node.targets[0])[1] == self.visit(node.value)[1])
         else:
             assert False, 'Currently don\'t support multiple assignment.'
 
@@ -227,7 +224,8 @@ class NodeVerifier(ast.NodeVisitor):
             assert isinstance(self.__type_map[node.func.value.id], ListType), \
                 '%s is not typed as list.' % node.func.value.id
             if isinstance(self.__type_map[node.func.value.id].elem_type, NumType):
-                self.__constraints.append(shortcuts.Equals(shortcuts.Select(self.visit(node.func.value.id)[1], self.visit(ast.Name('i'))), self.visit(node.args[0])[1]))
+                self.__constraints.append(self.visit(node.func.value.id)[1][_symbol('i', NumType)] ==
+                                          self.visit(node.args[0])[1])
 
         else:
             # TODO: check the function return type.
