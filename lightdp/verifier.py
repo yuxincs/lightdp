@@ -223,21 +223,16 @@ def verify(tree):
             # TODO: consider multiple functions scenario
             constraints = []
             NodeVerifier(constraints).visit(node)
-            final_constraints = shortcuts.And(constraints[0], shortcuts.Not(shortcuts.And(constraints[1:])))
-            from pysmt.printers import HRPrinter
-            import sys
-            printer = HRPrinter(sys.stdout)
+            final_constraints = z3.And(constraints[0], z3.Not(z3.And(constraints[1:])))
 
             print('\033[32;1mPrecondition:\033[0m')
-            sys.stdout.write('\t')
-            printer.printer(constraints[0])
-            sys.stdout.write('\n')
+            print(constraints[0])
             print('\033[32;1mConstraints:\033[0m')
             for constraint in constraints[1:]:
-                sys.stdout.write('\t')
-                printer.printer(constraint)
-                sys.stdout.write('\n')
+                print(constraint)
             print('\033[32;1mFinal Constraint:\033[0m')
-            printer.printer(final_constraints)
-            sys.stdout.write('\n')
-            return shortcuts.is_sat(final_constraints)
+            print(final_constraints)
+
+            s = z3.Solver()
+            s.add(final_constraints)
+            return s.check()
