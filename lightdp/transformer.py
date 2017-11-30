@@ -66,11 +66,11 @@ def transform(node):
     if isinstance(node, list):
         final_ast.append(transformer.visit(node[0]))
         for n in node[1:]:
-            ast = transformer.visit(n)
-            if isinstance(ast, ast.Module):
+            tree = transformer.visit(n)
+            if isinstance(tree, ast.Module):
                 # trim the 'def havoc(scale): pass' code for the rest
-                ast.body = ast.body[1:]
-            final_ast.append(ast)
+                tree.body = tree.body[1:]
+            final_ast.append(tree)
     else:
         final_ast.append(transformer.visit(node))
     return final_ast
