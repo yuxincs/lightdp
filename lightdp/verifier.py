@@ -152,12 +152,12 @@ class NodeVerifier(ast.NodeVisitor):
                     self.__type_map['^' + name] = ListType(NumType(0))
                     symbol_i = _symbol('i', self.__type_map['i'])
                     if isinstance(var_type.elem_type, NumType) and var_type.elem_type.value != '*':
-                        constraint = z3.ForAll([symbol_i], _symbol('^' + name, ListType(NumType(0)))[symbol_i] ==
-                                               ExpressionTranslator(self.__type_map).visit(
-                                                   ast.parse(var_type.elem_type.value)))
+                        constraint = _symbol('^' + name, ListType(NumType(0)))[symbol_i] == \
+                                     ExpressionTranslator(self.__type_map).visit(
+                                                   ast.parse(var_type.elem_type.value))
                     elif isinstance(var_type.elem_type, BoolType):
-                        constraint = z3.ForAll([symbol_i], _symbol('^' + name, ListType(NumType(0)))[symbol_i] ==
-                                               ExpressionTranslator(self.__type_map).visit(ast.parse('0')))
+                        constraint = _symbol('^' + name, ListType(NumType(0)))[symbol_i] == \
+                                               ExpressionTranslator(self.__type_map).visit(ast.parse('0'))
                 if constraint is not None:
                     self.__constraints.append(constraint)
             self.generic_visit(node)
