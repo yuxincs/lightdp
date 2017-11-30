@@ -167,7 +167,7 @@ class NodeVerifier(ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_Compare(self, node):
-        assert len(node.ops) == 1 and len(node.comparators), "Only allow one comparators in binary operations."
+        assert len(node.ops) == 1 and len(node.comparators), 'Only allow one comparators in binary operations.'
         left_expr = self.visit(node.left)
         right_expr = self.visit(node.comparators[0])
         return (_cmpop_map[node.ops[0].__class__](left_expr[0], right_expr[0]),
@@ -216,7 +216,7 @@ class NodeVerifier(ast.NodeVisitor):
             raise NotImplementedError('Currently don\'t support multiple assignment.')
 
     def visit_NameConstant(self, node):
-        assert node.value == True or node.value == False, 'Unsupported NameConstant %s' % str(node.value)
+        assert node.value is True or node.value is False, 'Unsupported NameConstant %s' % str(node.value)
         return node.value, NumType(0)
 
     def visit_Call(self, node):
