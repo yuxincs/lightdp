@@ -166,13 +166,8 @@ class NodeVerifier(ast.NodeVisitor):
 
     def visit_Name(self, node):
         assert node.id in self.__type_map, 'Undefined %s' % node.id
-        #if isinstance(self.__type_map[node.id], NumType):
         return (shortcuts.Symbol(node.id, to_smt_type(self.__type_map[node.id])),
                 shortcuts.Symbol('^' + node.id, to_smt_type(self.__type_map['^' + node.id])))
-                    #shortcuts.Plus(shortcuts.Symbol(node.id, to_smt_type(self.__type_map[node.id])),))
-        #else:
-            #return (shortcuts.Symbol(node.id, to_smt_type(self.__type_map[node.id])),
-                  #  shortcuts.Symbol(node.id, to_smt_type(self.__type_map[node.id])))
 
     def visit_Num(self, node):
         return shortcuts.Real(node.n), shortcuts.Real(0)
