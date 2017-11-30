@@ -4,7 +4,7 @@ import re
 from lightdp.typing import *
 import z3
 
-dot_operation_map = {
+_cmpop_map = {
     ast.Eq: lambda x, y: x == y,
     ast.Not: lambda x: z3.Not(x),
     ast.Gt: lambda x, y: x > y,
@@ -13,22 +13,19 @@ dot_operation_map = {
     ast.GtE: lambda x, y: x >= y
 }
 
-oplus_operation_map = {
+_binop_map = {
     ast.Add: lambda x, y: x + y,
-    ast.Sub: lambda x, y: x - y
-}
-
-otimes_operation_map = {
+    ast.Sub: lambda x, y: x - y,
     ast.Mult: lambda x, y: x * y,
     ast.Div: lambda x, y: x / y
 }
 
-bool_operation_map = {
+_boolop_map = {
     ast.And: lambda x, y: z3.And(x, y),
     ast.Or: lambda x, y: z3.Or(x, y)
 }
 
-unary_operation_map = {
+_unop_map = {
     ast.USub: lambda x: -x
 }
 
@@ -51,7 +48,7 @@ class ExpressionTranslator(ast.NodeVisitor):
 
     def visit_Compare(self, node):
         assert len(node.ops) == 1 and len(node.comparators), "Only allow one comparators in binary operations."
-        return dot_operation_map[node.ops[0].__class__](self.visit(node.left), self.visit(node.comparators[0]))
+        return _cmpop_map[node.ops[0].__class__](self.visit(node.left), self.visit(node.comparators[0]))
 
     def visit_Name(self, node):
         name = '^' + node.id if node.id in self.__distance_vars else node.id
@@ -69,22 +66,19 @@ class ExpressionTranslator(ast.NodeVisitor):
         return shortcuts.Real(node.n)
 
     def visit_BinOp(self, node):
-        if isinstance(node.op, tuple(oplus_operation_map.keys())):
-            return oplus_operation_map[node.op.__class__](self.visit(node.left), self.visit(node.right))
-        elif isinstance(node.op, tuple(otimes_operation_map.keys())):
-            return otimes_operation_map[node.op.__class__](self.visit(node.left), self.visit(node.right))
+        return _binop_map[node.op.__class__](self.visit(node.left), self.visit(node.right))
 
     def visit_Subscript(self, node):
         assert isinstance(node.slice, ast.Index), "Only index is supported."
         return shortcuts.Select(self.visit(node.value), self.visit(node.slice.value))
 
     def visit_BoolOp(self, node):
-        assert isinstance(node.op, tuple(bool_operation_map.keys()))
-        return bool_operation_map[node.op.__class__]([self.visit(value) for value in node.values])
+        from functools import reduce
+        return reduce(_boolop_map[node.op.__class__], [self.visit(value) for value in node.values])
 
     def visit_UnaryOp(self, node):
-        assert isinstance(node.op ,tuple(unary_operation_map.keys()))
-        return unary_operation_map[node.op.__class__](self.visit(node.operand))
+        assert isinstance(node.op, tuple(_unop_map.keys()))
+        return _unop_map[node.op.__class__](self.visit(node.operand))
 
     def generic_visit(self, node):
         assert False, 'Unexpeted node %s' % ast.dump(node)
@@ -160,9 +154,8 @@ class NodeVerifier(ast.NodeVisitor):
         assert len(node.ops) == 1 and len(node.comparators), "Only allow one comparators in binary operations."
         left_expr = self.visit(node.left)
         right_expr = self.visit(node.comparators[0])
-        return (dot_operation_map[node.ops[0].__class__](left_expr[0], right_expr[0]),
-                dot_operation_map[node.ops[0].__class__](shortcuts.Plus(left_expr[0], left_expr[1]),
-                                                         shortcuts.Plus(right_expr[0], right_expr[1])))
+        return (_cmpop_map[node.ops[0].__class__](left_expr[0], right_expr[0]),
+                _cmpop_map[node.ops[0].__class__](left_expr[0] + left_expr[1], right_expr[0] + right_expr[1]))
 
     def visit_Name(self, node):
         assert node.id in self.__type_map, 'Undefined %s' % node.id
@@ -173,12 +166,9 @@ class NodeVerifier(ast.NodeVisitor):
         return shortcuts.Real(node.n), shortcuts.Real(0)
 
     def visit_BinOp(self, node):
-        if isinstance(node.op, tuple(oplus_operation_map.keys())):
-            return (oplus_operation_map[node.op.__class__](self.visit(node.left)[0], self.visit(node.right)[0]),
-                    oplus_operation_map[node.op.__class__](self.visit(node.left)[1], self.visit(node.right)[1]))
-        elif isinstance(node.op, tuple(otimes_operation_map.keys())):
-            return (otimes_operation_map[node.op.__class__](self.visit(node.left)[0], self.visit(node.right)[0]),
-                    otimes_operation_map[node.op.__class__](self.visit(node.left)[1], self.visit(node.right)[1]))
+        assert isinstance(node.op, tuple(_binop_map.keys())), 'Unsupported BinOp %s' % ast.dump(node.op)
+        return (_binop_map[node.op.__class__](self.visit(node.left)[0], self.visit(node.right)[0]),
+                _binop_map[node.op.__class__](self.visit(node.left)[1], self.visit(node.right)[1]))
 
     def visit_Subscript(self, node):
         assert isinstance(node.slice, ast.Index), "Only index is supported."
@@ -186,14 +176,15 @@ class NodeVerifier(ast.NodeVisitor):
                 shortcuts.Select(self.visit(node.value)[1], self.visit(node.slice.value)[0]))
 
     def visit_BoolOp(self, node):
-        assert isinstance(node.op, tuple(bool_operation_map.keys()))
-        return (bool_operation_map[node.op.__class__]([self.visit(value)[0] for value in node.values]),
-                bool_operation_map[node.op.__class__]([self.visit(value)[1] for value in node.values]))
+        assert isinstance(node.op, tuple(_boolop_map.keys())), 'Unsupported BoolOp %s' % ast.dump(node.op)
+        from functools import reduce
+        return (reduce(_boolop_map[node.op.__class__], [self.visit(value)[0] for value in node.values]),
+                reduce(_boolop_map[node.op.__class__], [self.visit(value)[1] for value in node.values]))
 
     def visit_UnaryOp(self, node):
-        assert isinstance(node.op, tuple(unary_operation_map.keys()))
-        return (unary_operation_map[node.op.__class__](self.visit(node.operand)[0]),
-                unary_operation_map[node.op.__class__](self.visit(node.operand)[1]))
+        assert isinstance(node.op, tuple(_unop_map.keys())), 'Unsupported UnaryOp %s' % ast.dump(node.op)
+        return (_unop_map[node.op.__class__](self.visit(node.operand)[0]),
+                _unop_map[node.op.__class__](self.visit(node.operand)[1]))
 
     def visit_Assign(self, node):
         if isinstance(node.value, ast.Call) and node.value.func.id == 'Laplace':
