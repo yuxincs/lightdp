@@ -11,4 +11,4 @@ def test_prng():
     assert prng2.weight == 1
     assert isinstance(gauss.mech(1, 0, prng), float)
     assert isinstance(lapmech.mech(1, 0, prng), float)
-    assert (nm.mech(1, [1.0, 2.0, 3.0], prng), float)
+    assert isinstance(nm.mech(1, [1.0, 2.0, 3.0], prng), float)
