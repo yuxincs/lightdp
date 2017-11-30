@@ -30,6 +30,24 @@ _unop_map = {
 }
 
 
+def _symbol(name, lightdp_type):
+    if isinstance(lightdp_type, NumType):
+        return z3.Real(name)
+    elif isinstance(lightdp_type, ListType):
+        if isinstance(lightdp_type.elem_type, NumType):
+            return z3.Array(name, z3.RealSort(), z3.RealSort())
+        elif isinstance(lightdp_type.elem_type, BoolType):
+            return z3.Array(name, z3.BoolSort(), z3.RealSort())
+        else:
+            raise ValueError('Unsupported list inside list.')
+    elif isinstance(lightdp_type, FunctionType):
+        raise NotImplementedError('Function type is currently not supported.')
+    elif isinstance(lightdp_type, BoolType):
+        return z3.Bool(name)
+    else:
+        assert False, 'No such type %s' % lightdp_type
+
+
 # translate the expression ast into pysmt constraints
 class ExpressionTranslator(ast.NodeVisitor):
     def __init__(self, type_map, distance_vars=set()):
