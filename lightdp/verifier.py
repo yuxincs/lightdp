@@ -103,7 +103,7 @@ class NodeVerifier(ast.NodeVisitor):
                         constraint = self.__symbol('^' + name)[symbol_i] == \
                                      self.visit(self.parse_expr('0'))[0]
                 if constraint is not None:
-                    self.__constraints.append(constraint)
+                    self.__declarations.append(constraint)
 
             # parse the precondition to constraint
             distance_vars = re.findall(r"""\^([_a-zA-Z][0-9a-zA-Z_]*)""", precondition)
@@ -116,7 +116,6 @@ class NodeVerifier(ast.NodeVisitor):
             if forall_vars is not None:
                 pre_constraint = z3.ForAll([self.__symbol(var) for var in forall_vars], pre_constraint)
 
-            self.__constraints.insert(0, pre_constraint)
             self.__precondition = [pre_constraint]
 
             # empty the check list
@@ -126,12 +125,12 @@ class NodeVerifier(ast.NodeVisitor):
 
     def visit_If(self, node):
         test_node = self.visit(node.test)
-        self.__constraints.append(test_node[0] == test_node[1])
+        self.__checks.append(test_node[0] == test_node[1])
         self.generic_visit(node)
 
     def visit_IfExp(self, node):
         test_node = self.visit(node.test)
-        self.__constraints.append(test_node[0] == test_node[1])
+        self.__checks.append(test_node[0] == test_node[1])
         return z3.If(test_node[0], self.visit(node.body)[0], self.visit(node.orelse)[0]), \
                z3.If(test_node[1], self.visit(node.body)[1], self.visit(node.orelse)[1])
 
@@ -180,7 +179,7 @@ class NodeVerifier(ast.NodeVisitor):
                 pass
                 # raise NotImplementedError('List assignment not implemented.')
             else:
-                self.__constraints.append(self.visit(node.targets[0])[1] == self.visit(node.value)[1])
+                self.__declarations.append(self.visit(node.targets[0])[1] == self.visit(node.value)[1])
         else:
             raise NotImplementedError('Currently don\'t support multiple assignment.')
 
@@ -194,8 +193,8 @@ class NodeVerifier(ast.NodeVisitor):
             assert isinstance(self.__type_map[node.func.value.id], ListType), \
                 '%s is not typed as list.' % node.func.value.id
             if isinstance(self.__type_map[node.func.value.id].elem_type, NumType):
-                self.__constraints.append(self.visit(node.func.value.id)[1][self.__symbol('i')] ==
-                                          self.visit(node.args[0])[1])
+                self.__declarations.append(self.visit(node.func.value.id)[1][self.__symbol('i')] ==
+                                           self.visit(node.args[0])[1])
 
         else:
             # TODO: check the function return type.
