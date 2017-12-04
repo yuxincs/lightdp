@@ -74,45 +74,48 @@ class NodeVerifier(ast.NodeVisitor):
         annotation = NodeVerifier.parse_docstring(ast.get_docstring(node))
         if annotation is not None:
             forall_vars, precondition, self.__type_map = annotation
-            res = re.findall(r"""\^([_a-zA-Z][0-9a-zA-Z_]*)""", precondition)
 
-            if forall_vars is None:
-                self.__constraints.append(
-                    ExpressionTranslator(self.__type_map, set(res)).visit(ast.parse(precondition.replace('^', ''))))
-            else:
-                self.__constraints.append(
-                    z3.ForAll([_symbol(var, self.__type_map[var]) for var in forall_vars],
-                              ExpressionTranslator(self.__type_map, set(res)).visit(
-                                  ast.parse(precondition.replace('^', '')))))
-
-            for name, var_type in dict(self.__type_map).items():
-                if name[0] == '^':
-                    continue
+            # set the distance vars for the corresponding normal vars
+            from collections import OrderedDict
+            for name, var_type in OrderedDict(self.__type_map).items():
                 constraint = None
                 if isinstance(var_type, NumType):
                     self.__type_map['^' + name] = NumType(0)
-                    constraint = _symbol('^' + name, NumType(0)) == \
-                        ExpressionTranslator(self.__type_map).visit(ast.parse(var_type.value))
+                    constraint = self.__symbol('^' + name) == \
+                                 self.visit(self.parse_expr(var_type.value))[0]
                 elif isinstance(var_type, BoolType):
                     self.__type_map['^' + name] = NumType(0)
-                    constraint = _symbol('^' + name, NumType(0)) == \
-                        ExpressionTranslator(self.__type_map).visit(ast.parse('0'))
+                    constraint = self.__symbol('^' + name) == \
+                                 self.visit(self.parse_expr('0'))[0]
                 elif isinstance(var_type, FunctionType):
                     # TODO: consider FunctionType
                     pass
                 elif isinstance(var_type, ListType):
                     # TODO: consider list inside list
                     self.__type_map['^' + name] = ListType(NumType(0))
-                    symbol_i = _symbol('i', self.__type_map['i'])
+                    symbol_i = self.__symbol('i')
                     if isinstance(var_type.elem_type, NumType) and var_type.elem_type.value != '*':
-                        constraint = _symbol('^' + name, ListType(NumType(0)))[symbol_i] == \
-                                     ExpressionTranslator(self.__type_map).visit(
-                                                   ast.parse(var_type.elem_type.value))
+                        constraint = self.__symbol('^' + name)[symbol_i] == \
+                                     self.visit(self.parse_expr(var_type.elem_type.value))[0]
                     elif isinstance(var_type.elem_type, BoolType):
-                        constraint = _symbol('^' + name, ListType(NumType(0)))[symbol_i] == \
-                                               ExpressionTranslator(self.__type_map).visit(ast.parse('0'))
+                        constraint = self.__symbol('^' + name)[symbol_i] == \
+                                     self.visit(self.parse_expr('0'))[0]
                 if constraint is not None:
                     self.__constraints.append(constraint)
+
+            # parse the precondition to constraint
+            distance_vars = re.findall(r"""\^([_a-zA-Z][0-9a-zA-Z_]*)""", precondition)
+
+            pre_constraint = self.visit(self.parse_expr(precondition.replace('^', '')))[0]
+            for distance_var in distance_vars:
+                pre_constraint = z3.substitute(pre_constraint,
+                                               (self.__symbol(distance_var), self.__symbol('^' + distance_var)))
+
+            if forall_vars is not None:
+                pre_constraint = z3.ForAll([self.__symbol(var) for var in forall_vars], pre_constraint)
+
+            self.__constraints.insert(0, pre_constraint)
+
             self.generic_visit(node)
 
     def visit_If(self, node):
