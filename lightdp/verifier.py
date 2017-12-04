@@ -30,29 +30,29 @@ _unop_map = {
 }
 
 
-def _symbol(name, lightdp_type):
-    if isinstance(lightdp_type, NumType):
-        return z3.Real(name)
-    elif isinstance(lightdp_type, ListType):
-        if isinstance(lightdp_type.elem_type, NumType):
-            return z3.Array(name, z3.RealSort(), z3.RealSort())
-        elif isinstance(lightdp_type.elem_type, BoolType):
-            return z3.Array(name, z3.BoolSort(), z3.RealSort())
-        else:
-            raise ValueError('Unsupported list inside list.')
-    elif isinstance(lightdp_type, FunctionType):
-        raise NotImplementedError('Function type is currently not supported.')
-    elif isinstance(lightdp_type, BoolType):
-        return z3.Bool(name)
-    else:
-        assert False, 'No such type %s' % lightdp_type
-
-
 class NodeVerifier(ast.NodeVisitor):
     def __init__(self, constraints):
         assert isinstance(constraints, list)
         self.__constraints = constraints
-        self.__type_map = {}
+        self.__type_map = None
+
+    def __symbol(self, name):
+        lightdp_type = self.__type_map[name]
+        if isinstance(lightdp_type, NumType):
+            return z3.Real(name)
+        elif isinstance(lightdp_type, ListType):
+            if isinstance(lightdp_type.elem_type, NumType):
+                return z3.Array(name, z3.RealSort(), z3.RealSort())
+            elif isinstance(lightdp_type.elem_type, BoolType):
+                return z3.Array(name, z3.BoolSort(), z3.RealSort())
+            else:
+                raise ValueError('Unsupported list inside list.')
+        elif isinstance(lightdp_type, FunctionType):
+            raise NotImplementedError('Function type is currently not supported.')
+        elif isinstance(lightdp_type, BoolType):
+            return z3.Bool(name)
+        else:
+            assert False, 'No such type %s' % lightdp_type
 
     @staticmethod
     def parse_docstring(s):
