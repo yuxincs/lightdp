@@ -206,14 +206,23 @@ def verify(tree):
     for node in ast.walk(tree):
         if isinstance(node, ast.FunctionDef):
             # TODO: consider multiple functions scenario
-            constraints = []
+            constraints = {
+                'precondition': [],
+                'declarations': [],
+                'checks': [],
+            }
             NodeVerifier(constraints).visit(node)
-            final_constraints = z3.And(constraints[0], z3.Not(z3.And(constraints[1:])))
+            print(z3.Not(z3.And(constraints['checks'])))
+            final_constraints = z3.And(z3.And(constraints['precondition']), z3.And(constraints['declarations']),
+                                       z3.Not(z3.And(constraints['checks'])))
 
             print('\033[32;1mPrecondition:\033[0m')
-            print(constraints[0])
-            print('\033[32;1mConstraints:\033[0m')
-            for constraint in constraints[1:]:
+            print(constraints['precondition'])
+            print('\033[32;1mDeclarations:\033[0m')
+            for constraint in constraints['declarations']:
+                print(constraint)
+            print('\033[32;1mChecks:\033[0m')
+            for constraint in constraints['checks']:
                 print(constraint)
             print('\033[32;1mFinal Constraint:\033[0m')
             print(final_constraints)
