@@ -138,7 +138,7 @@ class NodeVerifier(ast.NodeVisitor):
 
     def visit_Name(self, node):
         assert node.id in self.__type_map, 'Undefined %s' % node.id
-        return _symbol(node.id, self.__type_map[node.id]), _symbol('^' + node.id, self.__type_map['^' + node.id])
+        return self.__symbol(node.id), self.__symbol('^' + node.id)
 
     def visit_Num(self, node):
         return node.n, 0
@@ -188,7 +188,7 @@ class NodeVerifier(ast.NodeVisitor):
             assert isinstance(self.__type_map[node.func.value.id], ListType), \
                 '%s is not typed as list.' % node.func.value.id
             if isinstance(self.__type_map[node.func.value.id].elem_type, NumType):
-                self.__constraints.append(self.visit(node.func.value.id)[1][_symbol('i', NumType)] ==
+                self.__constraints.append(self.visit(node.func.value.id)[1][self.__symbol('i')] ==
                                           self.visit(node.args[0])[1])
 
         else:
