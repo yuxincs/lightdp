@@ -180,7 +180,7 @@ class NodeVerifier(ast.NodeVisitor):
                 pass
                 # raise NotImplementedError('List assignment not implemented.')
             else:
-                self.__declarations.append(self.visit(node.targets[0])[1] == self.visit(node.value)[1])
+                self.__checks.append(self.visit(node.targets[0])[1] == self.visit(node.value)[1])
         else:
             raise NotImplementedError('Currently don\'t support multiple assignment.')
 
