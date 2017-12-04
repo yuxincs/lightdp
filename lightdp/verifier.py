@@ -213,18 +213,19 @@ def verify(tree):
                 'checks': [],
             }
             NodeVerifier(constraints).visit(node)
-            print(z3.Not(z3.And(constraints['checks'])))
             final_constraints = z3.And(z3.And(constraints['precondition']), z3.And(constraints['declarations']),
                                        z3.Not(z3.And(constraints['checks'])))
-
+            """
             print('\033[32;1mPrecondition:\033[0m')
-            print(constraints['precondition'])
+            for constraint in constraints['precondition']:
+                print('    ' + str(constraint))
             print('\033[32;1mDeclarations:\033[0m')
             for constraint in constraints['declarations']:
-                print(constraint)
+                print('    ' + str(constraint))
             print('\033[32;1mChecks:\033[0m')
             for constraint in constraints['checks']:
-                print(constraint)
+                print('    ' + str(constraint))
+            """
             print('\033[32;1mFinal Constraint:\033[0m')
             print(final_constraints)
 
