@@ -32,8 +32,10 @@ _unop_map = {
 
 class NodeVerifier(ast.NodeVisitor):
     def __init__(self, constraints):
-        assert isinstance(constraints, list)
-        self.__constraints = constraints
+        assert isinstance(constraints, dict)
+        self.__precondition = constraints['precondition']
+        self.__declarations = constraints['declarations']
+        self.__checks = constraints['checks']
         self.__type_map = None
 
     def __symbol(self, name):
