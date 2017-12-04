@@ -117,6 +117,10 @@ class NodeVerifier(ast.NodeVisitor):
                 pre_constraint = z3.ForAll([self.__symbol(var) for var in forall_vars], pre_constraint)
 
             self.__constraints.insert(0, pre_constraint)
+            self.__precondition = [pre_constraint]
+
+            # empty the check list
+            self.__checks = []
 
             self.generic_visit(node)
 
