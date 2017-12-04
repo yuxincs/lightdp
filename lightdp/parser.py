@@ -66,5 +66,6 @@ def build_parser():
         print('Error at %s' % p)
 
     parser = yacc.yacc(start='annotation')
-    parser.type_map = {}
+    from collections import OrderedDict
+    parser.type_map = OrderedDict()
     return parser

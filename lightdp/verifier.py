@@ -30,83 +30,29 @@ _unop_map = {
 }
 
 
-def _symbol(name, lightdp_type):
-    if isinstance(lightdp_type, NumType):
-        return z3.Real(name)
-    elif isinstance(lightdp_type, ListType):
-        if isinstance(lightdp_type.elem_type, NumType):
-            return z3.Array(name, z3.RealSort(), z3.RealSort())
-        elif isinstance(lightdp_type.elem_type, BoolType):
-            return z3.Array(name, z3.BoolSort(), z3.RealSort())
-        else:
-            raise ValueError('Unsupported list inside list.')
-    elif isinstance(lightdp_type, FunctionType):
-        raise NotImplementedError('Function type is currently not supported.')
-    elif isinstance(lightdp_type, BoolType):
-        return z3.Bool(name)
-    else:
-        assert False, 'No such type %s' % lightdp_type
-
-
-# translate the expression ast into pysmt constraints
-class ExpressionTranslator(ast.NodeVisitor):
-    def __init__(self, type_map, distance_vars=set()):
-        self.type_map = type_map
-        self.__distance_vars = distance_vars
-
-    def visit_Module(self, node):
-        assert isinstance(node.body[0], ast.Expr)
-        return self.visit(node.body[0])
-
-    def visit_Expr(self, node):
-        return self.visit(node.value)
-
-    def visit_IfExp(self, node):
-        return z3.If(self.visit(node.test), self.visit(node.body), self.visit(node.orelse))
-
-    def visit_Compare(self, node):
-        assert len(node.ops) == 1 and len(node.comparators), "Only allow one comparators in binary operations."
-        return _cmpop_map[node.ops[0].__class__](self.visit(node.left), self.visit(node.comparators[0]))
-
-    def visit_Name(self, node):
-        name = '^' + node.id if node.id in self.__distance_vars else node.id
-
-        assert name[0] == '^' or name in self.type_map, 'Undefined %s' % name
-        if name[0] == '^':
-            if isinstance(self.type_map[name[1:]], (NumType, BoolType, FunctionType)):
-                self.type_map[name] = NumType(0)
-            elif isinstance(self.type_map[name[1:]], ListType):
-                self.type_map[name] = ListType(NumType(0))
-        return _symbol(name, self.type_map[name])
-
-    def visit_Num(self, node):
-        return node.n
-
-    def visit_BinOp(self, node):
-        return _binop_map[node.op.__class__](self.visit(node.left), self.visit(node.right))
-
-    def visit_Subscript(self, node):
-        if not isinstance(node.slice, ast.Index):
-            raise NotImplementedError('Only one-dimension index is supported.')
-        return self.visit(node.value)[self.visit(node.slice.value)]
-
-    def visit_BoolOp(self, node):
-        from functools import reduce
-        return reduce(_boolop_map[node.op.__class__], [self.visit(value) for value in node.values])
-
-    def visit_UnaryOp(self, node):
-        assert isinstance(node.op, tuple(_unop_map.keys()))
-        return _unop_map[node.op.__class__](self.visit(node.operand))
-
-    def generic_visit(self, node):
-        assert False, 'Unexpeted node %s' % ast.dump(node)
-
-
 class NodeVerifier(ast.NodeVisitor):
     def __init__(self, constraints):
         assert isinstance(constraints, list)
         self.__constraints = constraints
-        self.__type_map = {}
+        self.__type_map = None
+
+    def __symbol(self, name):
+        lightdp_type = self.__type_map[name]
+        if isinstance(lightdp_type, NumType):
+            return z3.Real(name)
+        elif isinstance(lightdp_type, ListType):
+            if isinstance(lightdp_type.elem_type, NumType):
+                return z3.Array(name, z3.RealSort(), z3.RealSort())
+            elif isinstance(lightdp_type.elem_type, BoolType):
+                return z3.Array(name, z3.BoolSort(), z3.RealSort())
+            else:
+                raise ValueError('Unsupported list inside list.')
+        elif isinstance(lightdp_type, FunctionType):
+            raise NotImplementedError('Function type is currently not supported.')
+        elif isinstance(lightdp_type, BoolType):
+            return z3.Bool(name)
+        else:
+            assert False, 'No such type %s' % lightdp_type
 
     @staticmethod
     def parse_docstring(s):
@@ -117,54 +63,71 @@ class NodeVerifier(ast.NodeVisitor):
         parser = build_parser()
         return parser.parse(s, lexer=lexer)
 
+    @staticmethod
+    def parse_expr(expr):
+        node = ast.parse(expr)
+        assert isinstance(node, ast.Module) and isinstance(node.body[0], ast.Expr), \
+            r"""expr_parse fed with illegal expression string '%s'""" % expr
+        return node.body[0].value
+
     def visit_FunctionDef(self, node):
         annotation = NodeVerifier.parse_docstring(ast.get_docstring(node))
         if annotation is not None:
             forall_vars, precondition, self.__type_map = annotation
-            res = re.findall(r"""\^([_a-zA-Z][0-9a-zA-Z_]*)""", precondition)
 
-            if forall_vars is None:
-                self.__constraints.append(
-                    ExpressionTranslator(self.__type_map, set(res)).visit(ast.parse(precondition.replace('^', ''))))
-            else:
-                self.__constraints.append(
-                    z3.ForAll([_symbol(var, self.__type_map[var]) for var in forall_vars],
-                              ExpressionTranslator(self.__type_map, set(res)).visit(
-                                  ast.parse(precondition.replace('^', '')))))
-
-            for name, var_type in dict(self.__type_map).items():
-                if name[0] == '^':
-                    continue
+            # set the distance vars for the corresponding normal vars
+            from collections import OrderedDict
+            for name, var_type in OrderedDict(self.__type_map).items():
                 constraint = None
                 if isinstance(var_type, NumType):
                     self.__type_map['^' + name] = NumType(0)
-                    constraint = _symbol('^' + name, NumType(0)) == \
-                        ExpressionTranslator(self.__type_map).visit(ast.parse(var_type.value))
+                    constraint = self.__symbol('^' + name) == \
+                                 self.visit(self.parse_expr(var_type.value))[0]
                 elif isinstance(var_type, BoolType):
                     self.__type_map['^' + name] = NumType(0)
-                    constraint = _symbol('^' + name, NumType(0)) == \
-                        ExpressionTranslator(self.__type_map).visit(ast.parse('0'))
+                    constraint = self.__symbol('^' + name) == \
+                                 self.visit(self.parse_expr('0'))[0]
                 elif isinstance(var_type, FunctionType):
                     # TODO: consider FunctionType
                     pass
                 elif isinstance(var_type, ListType):
                     # TODO: consider list inside list
                     self.__type_map['^' + name] = ListType(NumType(0))
-                    symbol_i = _symbol('i', self.__type_map['i'])
+                    symbol_i = self.__symbol('i')
                     if isinstance(var_type.elem_type, NumType) and var_type.elem_type.value != '*':
-                        constraint = _symbol('^' + name, ListType(NumType(0)))[symbol_i] == \
-                                     ExpressionTranslator(self.__type_map).visit(
-                                                   ast.parse(var_type.elem_type.value))
+                        constraint = self.__symbol('^' + name)[symbol_i] == \
+                                     self.visit(self.parse_expr(var_type.elem_type.value))[0]
                     elif isinstance(var_type.elem_type, BoolType):
-                        constraint = _symbol('^' + name, ListType(NumType(0)))[symbol_i] == \
-                                               ExpressionTranslator(self.__type_map).visit(ast.parse('0'))
+                        constraint = self.__symbol('^' + name)[symbol_i] == \
+                                     self.visit(self.parse_expr('0'))[0]
                 if constraint is not None:
                     self.__constraints.append(constraint)
+
+            # parse the precondition to constraint
+            distance_vars = re.findall(r"""\^([_a-zA-Z][0-9a-zA-Z_]*)""", precondition)
+
+            pre_constraint = self.visit(self.parse_expr(precondition.replace('^', '')))[0]
+            for distance_var in distance_vars:
+                pre_constraint = z3.substitute(pre_constraint,
+                                               (self.__symbol(distance_var), self.__symbol('^' + distance_var)))
+
+            if forall_vars is not None:
+                pre_constraint = z3.ForAll([self.__symbol(var) for var in forall_vars], pre_constraint)
+
+            self.__constraints.insert(0, pre_constraint)
+
             self.generic_visit(node)
 
     def visit_If(self, node):
-        self.__constraints.append(self.visit(node.test)[0] == self.visit(node.test)[1])
+        test_node = self.visit(node.test)
+        self.__constraints.append(test_node[0] == test_node[1])
         self.generic_visit(node)
+
+    def visit_IfExp(self, node):
+        test_node = self.visit(node.test)
+        self.__constraints.append(test_node[0] == test_node[1])
+        return z3.If(test_node[0], self.visit(node.body)[0], self.visit(node.orelse)[0]), \
+               z3.If(test_node[1], self.visit(node.body)[1], self.visit(node.orelse)[1])
 
     def visit_Compare(self, node):
         assert len(node.ops) == 1 and len(node.comparators), 'Only allow one comparators in binary operations.'
@@ -175,7 +138,7 @@ class NodeVerifier(ast.NodeVisitor):
 
     def visit_Name(self, node):
         assert node.id in self.__type_map, 'Undefined %s' % node.id
-        return _symbol(node.id, self.__type_map[node.id]), _symbol('^' + node.id, self.__type_map['^' + node.id])
+        return self.__symbol(node.id), self.__symbol('^' + node.id)
 
     def visit_Num(self, node):
         return node.n, 0
@@ -225,7 +188,7 @@ class NodeVerifier(ast.NodeVisitor):
             assert isinstance(self.__type_map[node.func.value.id], ListType), \
                 '%s is not typed as list.' % node.func.value.id
             if isinstance(self.__type_map[node.func.value.id].elem_type, NumType):
-                self.__constraints.append(self.visit(node.func.value.id)[1][_symbol('i', NumType)] ==
+                self.__constraints.append(self.visit(node.func.value.id)[1][self.__symbol('i')] ==
                                           self.visit(node.args[0])[1])
 
         else:
