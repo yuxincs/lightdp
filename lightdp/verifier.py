@@ -48,60 +48,6 @@ def _symbol(name, lightdp_type):
         assert False, 'No such type %s' % lightdp_type
 
 
-# translate the expression ast into pysmt constraints
-class ExpressionTranslator(ast.NodeVisitor):
-    def __init__(self, type_map, distance_vars=set()):
-        self.type_map = type_map
-        self.__distance_vars = distance_vars
-
-    def visit_Module(self, node):
-        assert isinstance(node.body[0], ast.Expr)
-        return self.visit(node.body[0])
-
-    def visit_Expr(self, node):
-        return self.visit(node.value)
-
-    def visit_IfExp(self, node):
-        return z3.If(self.visit(node.test), self.visit(node.body), self.visit(node.orelse))
-
-    def visit_Compare(self, node):
-        assert len(node.ops) == 1 and len(node.comparators), "Only allow one comparators in binary operations."
-        return _cmpop_map[node.ops[0].__class__](self.visit(node.left), self.visit(node.comparators[0]))
-
-    def visit_Name(self, node):
-        name = '^' + node.id if node.id in self.__distance_vars else node.id
-
-        assert name[0] == '^' or name in self.type_map, 'Undefined %s' % name
-        if name[0] == '^':
-            if isinstance(self.type_map[name[1:]], (NumType, BoolType, FunctionType)):
-                self.type_map[name] = NumType(0)
-            elif isinstance(self.type_map[name[1:]], ListType):
-                self.type_map[name] = ListType(NumType(0))
-        return _symbol(name, self.type_map[name])
-
-    def visit_Num(self, node):
-        return node.n
-
-    def visit_BinOp(self, node):
-        return _binop_map[node.op.__class__](self.visit(node.left), self.visit(node.right))
-
-    def visit_Subscript(self, node):
-        if not isinstance(node.slice, ast.Index):
-            raise NotImplementedError('Only one-dimension index is supported.')
-        return self.visit(node.value)[self.visit(node.slice.value)]
-
-    def visit_BoolOp(self, node):
-        from functools import reduce
-        return reduce(_boolop_map[node.op.__class__], [self.visit(value) for value in node.values])
-
-    def visit_UnaryOp(self, node):
-        assert isinstance(node.op, tuple(_unop_map.keys()))
-        return _unop_map[node.op.__class__](self.visit(node.operand))
-
-    def generic_visit(self, node):
-        assert False, 'Unexpeted node %s' % ast.dump(node)
-
-
 class NodeVerifier(ast.NodeVisitor):
     def __init__(self, constraints):
         assert isinstance(constraints, list)
