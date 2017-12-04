@@ -119,7 +119,8 @@ class NodeVerifier(ast.NodeVisitor):
             self.generic_visit(node)
 
     def visit_If(self, node):
-        self.__constraints.append(self.visit(node.test)[0] == self.visit(node.test)[1])
+        test_node = self.visit(node.test)
+        self.__constraints.append(test_node[0] == test_node[1])
         self.generic_visit(node)
 
     def visit_IfExp(self, node):
