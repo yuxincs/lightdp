@@ -116,10 +116,11 @@ class NodeVerifier(ast.NodeVisitor):
             if forall_vars is not None:
                 pre_constraint = z3.ForAll([self.__symbol(var) for var in forall_vars], pre_constraint)
 
-            self.__precondition = [pre_constraint]
+            del self.__precondition[:]
+            self.__precondition.append(pre_constraint)
 
             # empty the check list
-            self.__checks = []
+            del self.__checks[:]
 
             self.generic_visit(node)
 
