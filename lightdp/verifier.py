@@ -122,6 +122,12 @@ class NodeVerifier(ast.NodeVisitor):
         self.__constraints.append(self.visit(node.test)[0] == self.visit(node.test)[1])
         self.generic_visit(node)
 
+    def visit_IfExp(self, node):
+        test_node = self.visit(node.test)
+        self.__constraints.append(test_node[0] == test_node[1])
+        return z3.If(test_node[0], self.visit(node.body)[0], self.visit(node.orelse)[0]), \
+               z3.If(test_node[1], self.visit(node.body)[1], self.visit(node.orelse)[1])
+
     def visit_Compare(self, node):
         assert len(node.ops) == 1 and len(node.comparators), 'Only allow one comparators in binary operations.'
         left_expr = self.visit(node.left)
