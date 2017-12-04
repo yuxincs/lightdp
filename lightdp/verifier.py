@@ -32,8 +32,10 @@ _unop_map = {
 
 class NodeVerifier(ast.NodeVisitor):
     def __init__(self, constraints):
-        assert isinstance(constraints, list)
-        self.__constraints = constraints
+        assert isinstance(constraints, dict)
+        self.__precondition = constraints['precondition']
+        self.__declarations = constraints['declarations']
+        self.__checks = constraints['checks']
         self.__type_map = None
 
     def __symbol(self, name):
@@ -101,7 +103,7 @@ class NodeVerifier(ast.NodeVisitor):
                         constraint = self.__symbol('^' + name)[symbol_i] == \
                                      self.visit(self.parse_expr('0'))[0]
                 if constraint is not None:
-                    self.__constraints.append(constraint)
+                    self.__declarations.append(constraint)
 
             # parse the precondition to constraint
             distance_vars = re.findall(r"""\^([_a-zA-Z][0-9a-zA-Z_]*)""", precondition)
@@ -114,18 +116,22 @@ class NodeVerifier(ast.NodeVisitor):
             if forall_vars is not None:
                 pre_constraint = z3.ForAll([self.__symbol(var) for var in forall_vars], pre_constraint)
 
-            self.__constraints.insert(0, pre_constraint)
+            del self.__precondition[:]
+            self.__precondition.append(pre_constraint)
+
+            # empty the check list
+            del self.__checks[:]
 
             self.generic_visit(node)
 
     def visit_If(self, node):
         test_node = self.visit(node.test)
-        self.__constraints.append(test_node[0] == test_node[1])
+        self.__checks.append(test_node[0] == test_node[1])
         self.generic_visit(node)
 
     def visit_IfExp(self, node):
         test_node = self.visit(node.test)
-        self.__constraints.append(test_node[0] == test_node[1])
+        self.__checks.append(test_node[0] == test_node[1])
         return z3.If(test_node[0], self.visit(node.body)[0], self.visit(node.orelse)[0]), \
                z3.If(test_node[1], self.visit(node.body)[1], self.visit(node.orelse)[1])
 
@@ -174,7 +180,7 @@ class NodeVerifier(ast.NodeVisitor):
                 pass
                 # raise NotImplementedError('List assignment not implemented.')
             else:
-                self.__constraints.append(self.visit(node.targets[0])[1] == self.visit(node.value)[1])
+                self.__declarations.append(self.visit(node.targets[0])[1] == self.visit(node.value)[1])
         else:
             raise NotImplementedError('Currently don\'t support multiple assignment.')
 
@@ -188,8 +194,8 @@ class NodeVerifier(ast.NodeVisitor):
             assert isinstance(self.__type_map[node.func.value.id], ListType), \
                 '%s is not typed as list.' % node.func.value.id
             if isinstance(self.__type_map[node.func.value.id].elem_type, NumType):
-                self.__constraints.append(self.visit(node.func.value.id)[1][self.__symbol('i')] ==
-                                          self.visit(node.args[0])[1])
+                self.__declarations.append(self.visit(node.func.value.id)[1][self.__symbol('i')] ==
+                                           self.visit(node.args[0])[1])
 
         else:
             # TODO: check the function return type.
@@ -201,18 +207,28 @@ def verify(tree):
     for node in ast.walk(tree):
         if isinstance(node, ast.FunctionDef):
             # TODO: consider multiple functions scenario
-            constraints = []
+            constraints = {
+                'precondition': [],
+                'declarations': [],
+                'checks': [],
+            }
             NodeVerifier(constraints).visit(node)
-            final_constraints = z3.And(constraints[0], z3.Not(z3.And(constraints[1:])))
-
+            final_constraints = z3.And(z3.And(constraints['precondition']), z3.And(constraints['declarations']),
+                                       z3.Not(z3.And(constraints['checks'])))
+            """
             print('\033[32;1mPrecondition:\033[0m')
-            print(constraints[0])
-            print('\033[32;1mConstraints:\033[0m')
-            for constraint in constraints[1:]:
-                print(constraint)
+            for constraint in constraints['precondition']:
+                print('    ' + str(constraint))
+            print('\033[32;1mDeclarations:\033[0m')
+            for constraint in constraints['declarations']:
+                print('    ' + str(constraint))
+            print('\033[32;1mChecks:\033[0m')
+            for constraint in constraints['checks']:
+                print('    ' + str(constraint))
+            """
             print('\033[32;1mFinal Constraint:\033[0m')
             print(final_constraints)
 
             s = z3.Solver()
             s.add(final_constraints)
-            return s.check()
+            return True if s.check() == 'sat' else False
