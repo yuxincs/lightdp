@@ -63,6 +63,13 @@ class NodeVerifier(ast.NodeVisitor):
         parser = build_parser()
         return parser.parse(s, lexer=lexer)
 
+    @staticmethod
+    def parse_expr(expr):
+        node = ast.parse(expr)
+        assert isinstance(node, ast.Module) and isinstance(node.body[0], ast.Expr), \
+            r"""expr_parse fed with illegal expression string '%s'""" % expr
+        return node.body[0].value
+
     def visit_FunctionDef(self, node):
         annotation = NodeVerifier.parse_docstring(ast.get_docstring(node))
         if annotation is not None:
