@@ -231,4 +231,4 @@ def verify(tree):
 
             s = z3.Solver()
             s.add(final_constraints)
-            return True if s.check() == 'sat' else False
+            return True if str(s.check()) == 'sat' else False
