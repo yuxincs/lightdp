@@ -31,7 +31,15 @@ _unop_map = {
 
 
 class NodeVerifier(ast.NodeVisitor):
+    """
+    Walks through the :py:class:`ast.AST` and generate constraints to be solved by z3.
+    """
     def __init__(self, constraints):
+        """
+        Initialization of :py:class:`NodeVerifier`.
+
+        :param constraints: The map object to be passed in the verifier, this map MUST contain three keys: precondition/declarations/checks.
+        """
         assert isinstance(constraints, dict)
         self.__precondition = constraints['precondition']
         self.__declarations = constraints['declarations']
@@ -203,6 +211,12 @@ class NodeVerifier(ast.NodeVisitor):
 
 
 def verify(tree):
+    """
+    Verify the :py:class:`ast.AST` and returns the satisfiability.
+
+    :param tree: The original :py:class:`ast.AST` node.
+    :return: True if the constraints are satisfied otherwise False.
+    """
     assert isinstance(tree, _ast.AST)
     for node in ast.walk(tree):
         if isinstance(node, ast.FunctionDef):

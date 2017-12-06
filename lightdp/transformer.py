@@ -1,10 +1,14 @@
 import ast
 
-
+# currently supported noise functions
 _noise_functions = ('Laplace', )
 
 
 class NodeTransformer(ast.NodeTransformer):
+    """
+    The transformer class to walk through the verified :py:class:`ast.AST` node and edit the node to a
+    runnable, privacy-preserving one.
+    """
     def visit_Module(self, node):
         new_node = self.generic_visit(node)
         new_node.body.insert(0, ast.FunctionDef(name='havoc',
@@ -61,6 +65,12 @@ class NodeTransformer(ast.NodeTransformer):
 
 
 def transform(node):
+    """
+    Transform the verified program to the runnable, privacy-preserving program.
+
+    :param node: The verified :py:class:`ast.AST`, or a :py:class:`list` of :py:class:`ast.AST`
+    :return: The transformed :py:class:`ast.AST`, or a :py:class:`list` of transformed :py:class:`ast.AST`
+    """
     transformer = NodeTransformer()
     if isinstance(node, list):
         final_ast = [transformer.visit(node[0])]
