@@ -1,6 +1,6 @@
 def build_parser():
     """
-    Build a ply.parser for parsing LightDP
+    Build a ply.parser for parsing LightDP annotations.
     :return: ply parser
     """
     from lightdp.typing import NumType, ListType, BoolType, FunctionType
