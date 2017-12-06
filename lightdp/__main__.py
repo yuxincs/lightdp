@@ -4,6 +4,10 @@ from lightdp import verifier, transformer
 
 
 def main():
+    """
+    Main function, parse the program argument and run the program.
+    :return: None
+    """
     import argparse
     import astunparse
 
