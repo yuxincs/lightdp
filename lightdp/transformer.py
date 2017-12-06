@@ -69,7 +69,7 @@ def transform(node):
     Transform the verified program to the runnable, privacy-preserving program.
 
     :param node: The verified :py:class:`ast.AST`, or a :py:class:`list` of :py:class:`ast.AST`
-    :returns: The transformed :py:class:`ast.AST`, or a :py:class:`list` of transformed :py:class:`ast.AST`
+    :return: The transformed :py:class:`ast.AST`, or a :py:class:`list` of transformed :py:class:`ast.AST`
     """
     transformer = NodeTransformer()
     if isinstance(node, list):
