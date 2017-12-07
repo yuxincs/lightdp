@@ -7,7 +7,7 @@ D1=[5.75,4.34,6.15,3.2,6.0,4.6,3.56,6.24,5.86,5.68]
 D2=[5.21,3.52,5.57,3.18,6.3,5.1,4.15,5.72,5.99,5.32]
 diff=[a-b for a,b in zip(D1,D2)]
 eps=2
-n=10000
+n=1000
 
 def noisymax(Q,eps):
     """
@@ -69,7 +69,7 @@ if __name__=="__main__":
         B.append(noisymax(D2,eps))
     print(Counter(A+B))
 
-    S=[4,7,8]
+    S=[4,7,8]  # write as {4,7,8} in reports
 
     # compute test statistic
     x=[]
@@ -90,7 +90,8 @@ if __name__=="__main__":
     for i in range(n):
         ti.append(sig_test_stat(R))
 
-    print(ti,T)
+    print(len(x),len(y))
 
     # compute p value
-    print("p value is "+str(sum(ti>=T)/n))
+    print("p value is "+str(len([x>=T for x in ti])/n))
+
