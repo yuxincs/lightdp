@@ -7,7 +7,7 @@ D1=[5.75,4.34,6.15,3.2,6.0,4.6,3.56,6.24,5.86,5.68]
 D2=[5.21,3.52,5.57,3.18,6.3,5.1,4.15,5.72,5.99,5.32]
 diff=[a-b for a,b in zip(D1,D2)]
 eps=2
-n=1000
+n=100
 
 def noisymax(Q,eps):
     """
@@ -54,6 +54,22 @@ def sig_test_stat(R):
             Y.append(i)
     return (test_stat(X,Y))
 
+def rev_sig_test_stat(R):
+    """
+        Function to reverse compute significance of the value of T
+    :param R: x and y
+    :return: test statistic
+    """
+
+    X=[]
+    Y=[]
+    for i in R:
+        if np.exp(eps)/(1+(np.exp(eps))) >= np.random.random():
+            X.append(i)
+        else:
+            Y.append(i)
+    return (test_stat(Y,X))
+
 if __name__=="__main__":
     # check if input queries are valid to use
     if all(abs(x)<=1 for x in diff):
@@ -82,16 +98,19 @@ if __name__=="__main__":
         if b in S:
             y.append(b)
 
-    T=test_stat(x,y)
+    T1=test_stat(x,y)
+    T2=test_stat(y,x)
 
     # compute significance of test statistic
     R=x+y
-    ti=[]
+    ti1=[]
+    ti2=[]
     for i in range(n):
-        ti.append(sig_test_stat(R))
+        ti1.append(sig_test_stat(R))
+        ti2.append(rev_sig_test_stat(R))
 
-    print(len(x),len(y))
 
+    print(T1,T2)
+    print(ti2)
     # compute p value
-    print("p value is "+str(len([x>=T for x in ti])/n))
-
+    print("p values are "+str(sum([x>=T1 for x in ti1])/n) +" and "+str(sum([x>=T2 for x in ti2])/n))
