@@ -12,7 +12,6 @@ except ImportError:
 
 
 def main():
-    releases = json.loads(urlrequest.urlopen('https://api.github.com/repos/Z3Prover/z3/releases').read())[0]
     system = sys.platform
     library_files = ['.txt', '.py']
     if 'linux' in system:
@@ -26,6 +25,8 @@ def main():
         library_files.append('Microsoft.Z3.dll')
         library_files.append('Microsoft.Z3.xml')
 
+    # read from GitHub apis
+    releases = json.loads(urlrequest.urlopen('https://api.github.com/repos/Z3Prover/z3/releases').read())[0]
     print('Downloading %s...' % releases['name'])
 
     for asset in releases['assets']:
