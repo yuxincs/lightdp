@@ -24,7 +24,7 @@ def main():
     library_files = ['.txt', '.py']
     if 'linux' in system:
         system = 'ubuntu-14.04'
-        library_files.append('libz3.a')
+        library_files.append('libz3.so')
     elif 'darwin' in system:
         system = 'osx'
         library_files.append('libz3.dylib')
