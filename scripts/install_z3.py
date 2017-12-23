@@ -15,14 +15,14 @@ def main():
     releases = json.loads(urlrequest.urlopen('https://api.github.com/repos/Z3Prover/z3/releases').read())[0]
     system = sys.platform
     library_files = ['.txt', '.py']
-    if system == "linux":
-        system = "ubuntu-14.04"
+    if 'linux' in system:
+        system = 'ubuntu-14.04'
         library_files.append('libz3.a')
-    elif system == "darwin":
-        system = "osx"
+    elif 'darwin' in system:
+        system = 'osx'
         library_files.append('libz3.dylib')
-    elif system == "windows":
-        system = "win"
+    elif 'windows' in system:
+        system = 'win'
         library_files.append('Microsoft.Z3.dll')
         library_files.append('Microsoft.Z3.xml')
 
