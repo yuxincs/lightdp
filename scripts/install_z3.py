@@ -15,7 +15,7 @@ def main():
     import argparse
 
     arg_parser = argparse.ArgumentParser(description=__doc__)
-    arg_parser.add_argument('output_dir', metavar='OUTPUT_DIR', type=str, nargs='1', default='./')
+    arg_parser.add_argument('output_dir', metavar='OUTPUT_DIR', type=str, nargs='?', default='./')
 
     results = arg_parser.parse_args()
 
