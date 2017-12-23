@@ -41,7 +41,7 @@ def main():
         if system in asset['name'] and 'x64' in asset['name']:
             # download the release zip file
             os.mkdir('./tmp')
-            os.mkdir('./z3')
+            os.mkdir('./tmp/z3')
             wget.download(asset['browser_download_url'], out='./tmp/z3.zip')
             print('Download finished. Extracting files...')
             zf = zipfile.ZipFile('./tmp/z3.zip')
@@ -51,10 +51,10 @@ def main():
                 # move the license file, python bindings and corresponding library
                 for library_file in library_files:
                     if file.endswith(library_file):
-                        shutil.move('./tmp/' + file, './z3/' + file[file.rfind('/'):])
+                        shutil.move('./tmp/' + file, './tmp/z3/' + file[file.rfind('/'):])
 
             print('Extract finished, removing temporary files...')
-            shutil.move('./z3', results.output_dir)
+            shutil.move('./tmp/z3', results.output_dir)
             shutil.rmtree('./tmp')
             print('Done.')
 
