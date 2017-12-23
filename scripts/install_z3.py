@@ -18,6 +18,8 @@ def main():
     arg_parser.add_argument('output_dir', metavar='OUTPUT_DIR', type=str, nargs='1', default='./')
 
     results = arg_parser.parse_args()
+
+    # detect os name
     system = sys.platform
     library_files = ['.txt', '.py']
     if 'linux' in system:
