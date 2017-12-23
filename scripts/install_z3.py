@@ -12,6 +12,12 @@ except ImportError:
 
 
 def main():
+    import argparse
+
+    arg_parser = argparse.ArgumentParser(description=__doc__)
+    arg_parser.add_argument('output_dir', metavar='OUTPUT_DIR', type=str, nargs='1', default='./')
+
+    results = arg_parser.parse_args()
     system = sys.platform
     library_files = ['.txt', '.py']
     if 'linux' in system:
@@ -46,7 +52,7 @@ def main():
                         shutil.move('./tmp/' + file, './z3/' + file[file.rfind('/'):])
 
             print('Extract finished, removing temporary files...')
-            shutil.move('./z3', '../')
+            shutil.move('./z3', results.output_dir)
             shutil.rmtree('./tmp')
             print('Done.')
 
