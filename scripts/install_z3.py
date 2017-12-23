@@ -12,7 +12,14 @@ except ImportError:
 
 
 def main():
-    releases = json.loads(urlrequest.urlopen('https://api.github.com/repos/Z3Prover/z3/releases').read())[0]
+    import argparse
+
+    arg_parser = argparse.ArgumentParser(description=__doc__)
+    arg_parser.add_argument('output_dir', metavar='OUTPUT_DIR', type=str, nargs='1', default='./')
+
+    results = arg_parser.parse_args()
+
+    # detect os name
     system = sys.platform
     library_files = ['.txt', '.py']
     if 'linux' in system:
@@ -26,6 +33,8 @@ def main():
         library_files.append('Microsoft.Z3.dll')
         library_files.append('Microsoft.Z3.xml')
 
+    # read from GitHub apis
+    releases = json.loads(urlrequest.urlopen('https://api.github.com/repos/Z3Prover/z3/releases').read())[0]
     print('Downloading %s...' % releases['name'])
 
     for asset in releases['assets']:
@@ -45,7 +54,7 @@ def main():
                         shutil.move('./tmp/' + file, './z3/' + file[file.rfind('/'):])
 
             print('Extract finished, removing temporary files...')
-            shutil.move('./z3', '../')
+            shutil.move('./z3', results.output_dir)
             shutil.rmtree('./tmp')
             print('Done.')
 
