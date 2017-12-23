@@ -34,7 +34,7 @@ def main():
         library_files.append('Microsoft.Z3.xml')
 
     # read from GitHub apis
-    releases = json.loads(urlrequest.urlopen('https://api.github.com/repos/Z3Prover/z3/releases').read())[0]
+    releases = json.loads(urlrequest.urlopen('https://api.github.com/repos/Z3Prover/z3/releases').read().decode('utf-8'))[0]
     print('Downloading %s...' % releases['name'])
 
     for asset in releases['assets']:
