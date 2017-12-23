@@ -15,6 +15,7 @@ cache: pip
 
 install:
   - pip install tox-travis
+  - python ./script/install_z3.py
 
 script:
   - tox
