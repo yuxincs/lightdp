@@ -37,11 +37,11 @@ def main():
         if results.json_file is not None:
             with open(results.json_file, 'w') as out:
                 import json
-                json.dump(out, {
+                json.dump({
                     'is_sat': is_sat,
                     'constraints': constraints,
                     'transformed': transformed
-                })
+                }, out)
 
         # print('\033[32;1mFinal Constraint:\033[0m')
         # print(in_file + ' : satisfiable' if is_sat else ' : unsatisfiable')
