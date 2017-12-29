@@ -68,19 +68,8 @@ def transform(node):
     """
     Transform the verified program to the runnable, privacy-preserving program.
 
-    :param node: The verified :py:class:`ast.AST`, or a :py:class:`list` of :py:class:`ast.AST`
-    :return: The transformed :py:class:`ast.AST`, or a :py:class:`list` of transformed :py:class:`ast.AST`
+    :param node: The verified :py:class:`ast.AST``
+    :return: The transformed :py:class:`ast.AST``
     """
-    transformer = NodeTransformer()
-    if isinstance(node, list):
-        final_ast = [transformer.visit(node[0])]
-        for n in node[1:]:
-            tree = transformer.visit(n)
-            if isinstance(tree, ast.Module):
-                # trim the 'def havoc(scale): pass' code for the rest
-                tree.body = tree.body[1:]
-            final_ast.append(tree)
-        return final_ast
-    else:
-        return transformer.visit(node)
+    return NodeTransformer().visit(node)
 

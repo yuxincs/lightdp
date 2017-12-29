@@ -244,9 +244,7 @@ def verify(tree):
             for constraint in constraints['checks']:
                 print('    ' + str(constraint))
             """
-            print('\033[32;1mFinal Constraint:\033[0m')
-            print(final_constraints)
 
             s = z3.Solver()
             s.add(final_constraints)
-            return True if s.check() == z3.sat else False
+            return True if s.check() == z3.sat else False, str(final_constraints)
