@@ -12,7 +12,7 @@ def main():
     import astunparse
 
     arg_parser = argparse.ArgumentParser(description=__doc__)
-    arg_parser.add_argument('file', metavar='FILE', type=str, nargs='1')
+    arg_parser.add_argument('file', metavar='FILE', type=str, nargs=1)
     arg_parser.add_argument('-o', '--out',
                             action='store', dest='out', type=str,
                             help='The output file name.', required=False)
