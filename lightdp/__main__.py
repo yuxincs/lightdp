@@ -31,7 +31,7 @@ def main():
         transformed = None
         if not is_sat:
             with open(results.out, 'w') as out:
-                transformed = transformer.transform(tree)
+                transformed = astunparse.unparse(transformer.transform(tree))
                 out.write(transformed)
 
         if results.json_file is not None:
