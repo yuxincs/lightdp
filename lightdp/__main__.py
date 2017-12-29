@@ -29,7 +29,7 @@ def main():
         tree = ast.parse(f.read())
         is_sat, constraints = verifier.verify(tree)
         transformed = None
-        if is_sat:
+        if not is_sat:
             with open(results.out, 'w') as out:
                 transformed = transformer.transform(tree)
                 out.write(transformed)
