@@ -29,3 +29,6 @@ dist/
 
 # Python cache
 _pycache_/
+
+# Z3 library release files
+z3/
