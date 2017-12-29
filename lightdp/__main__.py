@@ -21,7 +21,7 @@ def main():
                             help='Output all results in json format.', required=False)
 
     results = arg_parser.parse_args()
-
+    results.file = results.file[0]
     results.out = results.file[0:results.file.rfind('.')] + '_t.py' if results.out is None else results.out
 
     # parse / verify / transform the file
