@@ -1,5 +1,7 @@
 import numpy as np
 from collections import Counter
+import multiprocessing as mp
+import math
 
 
 # Create two values of input which satisfies the property of input query, along with some hyperparameters
@@ -10,7 +12,7 @@ eps1=4
 eps2=2
 T=5
 N=2
-n=100
+n=1000
 
 def noisymax(Q,eps):
     """
@@ -90,34 +92,63 @@ if __name__=="__main__":
     #         B.append(noisymax(D2,eps))
     #     print(Counter(A+B))
 
-    S=[7,4,2]
-
-    # noisymax:
-
-    for eps1 in range(2,10):
-        # compute test statistic
-        x=[]
-        y=[]
-        for i in range(n):
-            a=noisymax(D1,eps1)
-            b=noisymax(D2,eps1)
+    def calc_xy(id, func, D1, D2, S, eps1, eps2, n, result_queue):
+        print('[Process-%d] Started with %d' % (id, n))
+        x = []
+        y = []
+        for _ in range(n):
+            a = func(D1, eps1)
+            b = func(D2, eps1)
             if a in S:
                 x.append(a)
             if b in S:
                 y.append(b)
 
-        T1=test_stat(x,y,eps2)
-        T2=test_stat(y,x,eps2)
+        T1 = test_stat(x, y, eps2)
+        T2 = test_stat(y, x, eps2)
 
         # compute significance of test statistic
-        R=x+y
-        ti1=[]
-        ti2=[]
+        R = x + y
+        ti1 = []
+        ti2 = []
         for i in range(n):
-            ti1.append(sig_test_stat(R,eps2))
-            ti2.append(sig_test_stat(R,eps2))
+            ti1.append(sig_test_stat(R, eps2))
+            ti2.append(sig_test_stat(R, eps2))
 
-        result=[eps1,sum([x>=T1 for x in ti1])/n,sum([x>=T2 for x in ti2])/n]
+        result_queue.put((sum([x >= T1 for x in ti1]), sum([x >= T2 for x in ti2])))
+        print('[Process-%d] Finished' % id)
+        return
+
+    S=[7,4,2]
+
+    # noisymax:
+    for eps1 in range(2,10):
+        # compute test statistic
+        result_queue = mp.Queue()
+        processes = []
+        # TODO: maybe mp.cpu_count() * 2 because of hyper-threading?
+        for i in range(mp.cpu_count()):
+            process = mp.Process(target=calc_xy, args=(i, noisymax, D1, D2, S, eps1, eps2,
+                                                       int(math.ceil(float(n) / mp.cpu_count())), result_queue))
+            processes.append(process)
+            process.start()
+
+        print('Generate %d processes for %s function' % (mp.cpu_count(), 'NoisyMax'))
+
+        for process in processes:
+            process.join()
+
+        print('Work finished, merge the results')
+
+        # merge the results
+        value1 = 0
+        value2 = 0
+        for _ in range(len(processes)):
+            local_v1, local_v2 = result_queue.get()
+            value1 += local_v1
+            value2 += local_v2
+
+        result = [eps1, value1 / n, value2 / n]
         # compute p value
         print(str(result))
 
@@ -133,8 +164,9 @@ if __name__=="__main__":
     #     print(Counter(A+B))
 
     S=[3,2]
-
+    # TODO: sparse vector can be merged
     # sparse vector:
+    """
     for eps1 in range(2,10):
         # compute test statistic
         x=[]
@@ -161,3 +193,4 @@ if __name__=="__main__":
         result=[eps1,sum([x>=T1 for x in ti1])/n,sum([x>=T2 for x in ti2])/n]
         # compute p value
         print(str(result))
+        """
