@@ -77,13 +77,6 @@ def sig_test_stat(R, eps):
     return test_stat(X, Y, eps)
 
 
-def main():
-    # check if input queries are valid to use
-    if all(abs(x) <= 1 for x in diff):
-        print('Valid Input')
-    else:
-        print('Invalid Input')
-
     # to find a reasonable S
 
     # for eps in range(2,10):
@@ -196,5 +189,9 @@ def main():
         print(str(result))
         """
 
+
+def main():
+    # check if input queries are valid to use
+    assert all(abs(a - b) <= 1 for a, b in zip(D1, D2))
 if __name__=="__main__":
    main()
