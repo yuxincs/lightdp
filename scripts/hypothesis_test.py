@@ -135,8 +135,6 @@ def main():
     D2 = [5.21, 3.52, 5.57, 3.18, 5.6, 5.1, 4.15, 5.72, 5.99, 5.32]
     # check if input queries are valid to use
     assert all(abs(a - b) <= 1 for a, b in zip(D1, D2))
-    T = 5
-    N = 2
     n = 1000
 
     # hand-picked S for the two algorithms
