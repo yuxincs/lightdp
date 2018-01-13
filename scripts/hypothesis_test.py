@@ -49,7 +49,7 @@ def test_stat(x, y, n, eps=2):
     :param y: input array
     :return: T
     """
-    return (len(x) / n) - (np.exp(eps)) * (len(y) / n)  # one of the options
+    return (len(x) / float(n)) - (np.exp(eps)) * (len(y) / float(n))  # one of the options
 
 
 def hypothesis_test(algorithm, D1, D2, args, iterations, stat_test_func, S_selector, cores=0):
