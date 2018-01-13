@@ -13,6 +13,7 @@ eps2 = 2
 T = 5
 N = 2
 n = 10000
+import os
 
 
 def noisymax(Q, eps):
@@ -95,6 +96,7 @@ def main():
 
     def calc_xy(id, func, D1, D2, S, eps1, eps2, n, result_queue):
         print('[Process-%d] Started with %d' % (id, n))
+        np.random.seed(int(os.urandom(4).encode('hex'), 16))
         x = []
         y = []
         for _ in range(n):
