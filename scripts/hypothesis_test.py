@@ -135,7 +135,6 @@ def main():
     D2 = [5.21, 3.52, 5.57, 3.18, 5.6, 5.1, 4.15, 5.72, 5.99, 5.32]
     # check if input queries are valid to use
     assert all(abs(a - b) <= 1 for a, b in zip(D1, D2))
-    n = 1000
 
     # hand-picked S for the two algorithms
     def S_selector(algorithm):
@@ -165,9 +164,16 @@ def main():
         if algorithm.__name__ == 'sparsevector':
             return [3, 2]
 
+    import argparse
+    arg_parser = argparse.ArgumentParser(description='Hypothesis testing framework for LightDP.')
+    arg_parser.add_argument('n', metavar='ITERATIONS', type=int, nargs='?',
+                            help='Number of iterations to run.', default=10000)
+
+    results = arg_parser.parse_args()
+
     # NoisyMax test
     for eps in range(7, 15):
-        res = hypothesis_test(noisymax, D1, D2, (eps, ), n, test_stat, S_selector)
+        res = hypothesis_test(noisymax, D1, D2, (eps, ), results.n, test_stat, S_selector)
         print(res)
     # TODO: bring back the sprase vector test
 
