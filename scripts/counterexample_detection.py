@@ -5,16 +5,17 @@ import math
 
 
 # Create two values of input which satisfies the property of input query, along with some hyperparameters
-D1=[5.75,4.34,6.15,3.2,5.8,4.6,3.56,6.24,5.86,5.68]
-D2=[5.21,3.52,5.57,3.18,5.6,5.1,4.15,5.72,5.99,5.32]
-diff=[a-b for a,b in zip(D1,D2)]
-eps1=4
-eps2=2
-T=5
-N=2
-n=1000
+D1 = [5.75, 4.34, 6.15, 3.2, 5.8, 4.6, 3.56, 6.24, 5.86, 5.68]
+D2 = [5.21, 3.52, 5.57, 3.18, 5.6, 5.1, 4.15, 5.72, 5.99, 5.32]
+diff = [a - b for a, b in zip(D1, D2)]
+eps1 = 4
+eps2 = 2
+T = 5
+N = 2
+n = 100000
 
-def noisymax(Q,eps):
+
+def noisymax(Q, eps):
     """
         Here use noisy max algorithm as a test case.
         The noise source will be laplace mechanism.
@@ -24,60 +25,60 @@ def noisymax(Q,eps):
     :param eps: parameter of lapalce mechanism
     :return: index of maximum value from noisy result
     """
-
     # add lapalce noise
-    N=[a + np.random.laplace(scale=1.0/eps) for a in Q]
+    noisy_array = [a + np.random.laplace(scale=1.0 / eps) for a in Q]
 
     # compare the largest noisy element and return the index of primal query along with the max value
-    return np.argmax(N)
+    return np.argmax(noisy_array)
 
-def sparsevector(T,N,eps,q):
-    out=[]
-    eta1=np.random.laplace(scale=2.0/eps)
-    Tbar=T+eta1
-    c1,c2,i=0,0,0
-    while(c1<N and i<len(q)):
-        eta2=np.random.laplace(scale=4*N/eps)
-        if(q[i]+eta2>=Tbar):
+
+def sparsevector(T, N, eps, q):
+    out = []
+    eta1 = np.random.laplace(scale=2.0 / eps)
+    Tbar = T + eta1
+    c1, c2, i = 0, 0, 0
+    while c1 < N and i < len(q):
+        eta2 = np.random.laplace(scale=4 * N / eps)
+        if q[i] + eta2 >= Tbar:
             out.append(True)
-            c1+=1
+            c1 += 1
         else:
             out.append(False)
-            c2+=1
-        i+=1
+            c2 += 1
+        i += 1
 
     return len(out)
 
-def test_stat(x,y,eps):
+
+def test_stat(x, y, eps):
     """
         Function to compute test statistic T
     :param x: input array
     :param y: input array
     :return: T
     """
+    return (len(x) / n) - (np.exp(eps)) * (len(y) / n)  # one of the options
 
-    result=(len(x)/n)-(np.exp(eps))*(len(y)/n) # one of the options
-    return result
 
-def sig_test_stat(R,eps):
+def sig_test_stat(R, eps):
     """
         Function to compute significance of the value of T
     :param R: x and y
     :return: test statistic
     """
-
-    X=[]
-    Y=[]
+    X = []
+    Y = []
     for i in R:
-        if np.exp(eps)/(1+(np.exp(eps))) >= np.random.random():
+        if np.exp(eps) / (1 + (np.exp(eps))) >= np.random.random():
             X.append(i)
         else:
             Y.append(i)
-    return (test_stat(X,Y,eps))
+    return (test_stat(X, Y, eps))
 
-if __name__=="__main__":
+
+def main():
     # check if input queries are valid to use
-    if all(abs(x)<=1 for x in diff):
+    if all(abs(x) <= 1 for x in diff):
         print('Valid Input')
     else:
         print('Invalid Input')
@@ -119,10 +120,10 @@ if __name__=="__main__":
         print('[Process-%d] Finished' % id)
         return
 
-    S=[7,4,2]
+    S = [7, 4, 2]
 
     # noisymax:
-    for eps1 in range(2,10):
+    for eps1 in range(2, 10):
         # compute test statistic
         result_queue = mp.Queue()
         processes = []
@@ -152,9 +153,7 @@ if __name__=="__main__":
         # compute p value
         print(str(result))
 
-
-
-    #find appropriate S for sparse vector
+    # find appropriate S for sparse vector
     # for eps in range(2,10):
     #     A=[]
     #     B=[]
@@ -163,7 +162,7 @@ if __name__=="__main__":
     #         B.append(sparsevector(T,N,4,D2))
     #     print(Counter(A+B))
 
-    S=[3,2]
+    S = [3, 2]
     # TODO: sparse vector can be merged
     # sparse vector:
     """
@@ -194,3 +193,6 @@ if __name__=="__main__":
         # compute p value
         print(str(result))
         """
+
+if __name__=="__main__":
+   main()
