@@ -127,7 +127,7 @@ def main():
         # compute test statistic
         result_queue = mp.Queue()
         processes = []
-        
+
         for i in range(mp.cpu_count()):
             process = mp.Process(target=calc_xy, args=(i, noisymax, D1, D2, S, eps1, eps2,
                                                        int(math.ceil(float(n) / mp.cpu_count())), result_queue))
@@ -149,7 +149,7 @@ def main():
             value1 += local_v1
             value2 += local_v2
 
-        result = [eps1, value1 / n, value2 / n]
+        result = [eps1, float(value1) / n, float(value2) / n]
         # compute p value
         print(str(result))
 
