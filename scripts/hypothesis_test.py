@@ -12,7 +12,7 @@ eps1 = 4
 eps2 = 2
 T = 5
 N = 2
-n = 100000
+n = 10000
 
 
 def noisymax(Q, eps):
@@ -73,7 +73,7 @@ def sig_test_stat(R, eps):
             X.append(i)
         else:
             Y.append(i)
-    return (test_stat(X, Y, eps))
+    return test_stat(X, Y, eps)
 
 
 def main():
