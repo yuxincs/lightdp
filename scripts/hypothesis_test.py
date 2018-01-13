@@ -112,7 +112,7 @@ def sig_test_stat(R, eps):
             ti2.append(sig_test_stat(R, eps2))
 
         result_queue.put((sum([x >= T1 for x in ti1]), sum([x >= T2 for x in ti2])))
-        print('[Process-%d] Finished' % id)
+        # print('[Process-%d] Finished' % id)
         return
 
     S = [7, 4, 2]
@@ -129,12 +129,12 @@ def sig_test_stat(R, eps):
             processes.append(process)
             process.start()
 
-        print('Generate %d processes for %s function' % (mp.cpu_count(), 'NoisyMax'))
+        # print('Generate %d processes for %s function' % (mp.cpu_count(), 'NoisyMax'))
 
         for process in processes:
             process.join()
 
-        print('Work finished, merge the results')
+        # print('Work finished, merge the results')
 
         # merge the results
         value1 = 0
