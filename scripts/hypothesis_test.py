@@ -167,7 +167,7 @@ def main():
 
     # NoisyMax test
     for eps in range(7, 15):
-        res = hypothesis_test(noisymax, D1, D2, (eps, ), n, test_stat, S_selector, cores=1)
+        res = hypothesis_test(noisymax, D1, D2, (eps, ), n, test_stat, S_selector)
         print(res)
     # TODO: bring back the sprase vector test
 
