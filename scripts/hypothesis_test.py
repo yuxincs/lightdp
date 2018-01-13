@@ -3,6 +3,7 @@ from collections import Counter
 import multiprocessing as mp
 import math
 import os
+import codecs
 
 
 def noisymax(Q, eps):
@@ -55,7 +56,7 @@ def hypothesis_test(algorithm, D1, D2, args, iterations, stat_test_func, S_selec
     def calc(p_id, func, D1, D2, S, args, n, result_queue):
         # print('[Process-%d] Started with %d' % (id, n))
         # reseed the numpy random module
-        np.random.seed(int(os.urandom(4).encode('hex'), 16))
+        np.random.seed(int(codecs.encode(os.urandom(4), 'hex'), 16))
         x = []
         y = []
         for _ in range(n):
