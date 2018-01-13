@@ -127,7 +127,7 @@ def main():
         # compute test statistic
         result_queue = mp.Queue()
         processes = []
-        # TODO: maybe mp.cpu_count() * 2 because of hyper-threading?
+        
         for i in range(mp.cpu_count()):
             process = mp.Process(target=calc_xy, args=(i, noisymax, D1, D2, S, eps1, eps2,
                                                        int(math.ceil(float(n) / mp.cpu_count())), result_queue))
