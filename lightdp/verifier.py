@@ -38,20 +38,20 @@ class NodeVerifier(ast.NodeVisitor):
     """
     Walks through the :py:class:`ast.AST` and generate constraints to be solved by z3.
     """
-    def __init__(self, constraints):
+    def __init__(self):
         """
         Initialization of :py:class:`NodeVerifier`.
-
-        :param constraints: The map object to be passed in the verifier, this map MUST contain three keys: precondition/declarations/checks.
         """
-        assert isinstance(constraints, dict)
-        self.__precondition = constraints['precondition']
-        self.__declarations = constraints['declarations']
-        self.__checks = constraints['checks']
-        self.__type_map = None
+        self._precondition = []
+        self._declarations = []
+        self._checks = []
+        self._type_map = None
 
-    def __symbol(self, name):
-        lightdp_type = self.__type_map[name]
+    def get_constraint(self):
+        return z3.And(z3.And(self._precondition), z3.And(self._declarations), z3.Not(z3.And(self._checks)))
+
+    def _symbol(self, name):
+        lightdp_type = self._type_map[name]
         if isinstance(lightdp_type, NumType):
             return z3.Real(name)
         elif isinstance(lightdp_type, ListType):
@@ -87,35 +87,35 @@ class NodeVerifier(ast.NodeVisitor):
     def visit_FunctionDef(self, node):
         annotation = NodeVerifier.parse_docstring(ast.get_docstring(node))
         if annotation is not None:
-            forall_vars, precondition, self.__type_map = annotation
+            forall_vars, precondition, self._type_map = annotation
 
             # set the distance vars for the corresponding normal vars
             from collections import OrderedDict
-            for name, var_type in OrderedDict(self.__type_map).items():
+            for name, var_type in OrderedDict(self._type_map).items():
                 constraint = None
                 if isinstance(var_type, NumType):
-                    self.__type_map['^' + name] = NumType(0)
-                    constraint = self.__symbol('^' + name) == \
+                    self._type_map['^' + name] = NumType(0)
+                    constraint = self._symbol('^' + name) == \
                                  self.visit(self.parse_expr(var_type.value))[0]
                 elif isinstance(var_type, BoolType):
-                    self.__type_map['^' + name] = NumType(0)
-                    constraint = self.__symbol('^' + name) == \
+                    self._type_map['^' + name] = NumType(0)
+                    constraint = self._symbol('^' + name) == \
                                  self.visit(self.parse_expr('0'))[0]
                 elif isinstance(var_type, FunctionType):
                     # TODO: consider FunctionType
                     pass
                 elif isinstance(var_type, ListType):
                     # TODO: consider list inside list
-                    self.__type_map['^' + name] = ListType(NumType(0))
-                    symbol_i = self.__symbol('i')
+                    self._type_map['^' + name] = ListType(NumType(0))
+                    symbol_i = self._symbol('i')
                     if isinstance(var_type.elem_type, NumType) and var_type.elem_type.value != '*':
-                        constraint = self.__symbol('^' + name)[symbol_i] == \
+                        constraint = self._symbol('^' + name)[symbol_i] == \
                                      self.visit(self.parse_expr(var_type.elem_type.value))[0]
                     elif isinstance(var_type.elem_type, BoolType):
-                        constraint = self.__symbol('^' + name)[symbol_i] == \
+                        constraint = self._symbol('^' + name)[symbol_i] == \
                                      self.visit(self.parse_expr('0'))[0]
                 if constraint is not None:
-                    self.__declarations.append(constraint)
+                    self._declarations.append(constraint)
 
             # parse the precondition to constraint
             distance_vars = re.findall(r"""\^([_a-zA-Z][0-9a-zA-Z_]*)""", precondition)
@@ -123,27 +123,27 @@ class NodeVerifier(ast.NodeVisitor):
             pre_constraint = self.visit(self.parse_expr(precondition.replace('^', '')))[0]
             for distance_var in distance_vars:
                 pre_constraint = z3.substitute(pre_constraint,
-                                               (self.__symbol(distance_var), self.__symbol('^' + distance_var)))
+                                               (self._symbol(distance_var), self._symbol('^' + distance_var)))
 
             if forall_vars is not None:
-                pre_constraint = z3.ForAll([self.__symbol(var) for var in forall_vars], pre_constraint)
+                pre_constraint = z3.ForAll([self._symbol(var) for var in forall_vars], pre_constraint)
 
-            del self.__precondition[:]
-            self.__precondition.append(pre_constraint)
+            del self._precondition[:]
+            self._precondition.append(pre_constraint)
 
             # empty the check list
-            del self.__checks[:]
+            del self._checks[:]
 
             self.generic_visit(node)
 
     def visit_If(self, node):
         test_node = self.visit(node.test)
-        self.__checks.append(test_node[0] == test_node[1])
+        self._checks.append(test_node[0] == test_node[1])
         self.generic_visit(node)
 
     def visit_IfExp(self, node):
         test_node = self.visit(node.test)
-        self.__checks.append(test_node[0] == test_node[1])
+        self._checks.append(test_node[0] == test_node[1])
         return z3.If(test_node[0], self.visit(node.body)[0], self.visit(node.orelse)[0]), \
                z3.If(test_node[1], self.visit(node.body)[1], self.visit(node.orelse)[1])
 
@@ -155,8 +155,8 @@ class NodeVerifier(ast.NodeVisitor):
                 _cmpop_map[node.ops[0].__class__](left_expr[0] + left_expr[1], right_expr[0] + right_expr[1]))
 
     def visit_Name(self, node):
-        assert node.id in self.__type_map, 'Undefined %s' % node.id
-        return self.__symbol(node.id), self.__symbol('^' + node.id)
+        assert node.id in self._type_map, 'Undefined %s' % node.id
+        return self._symbol(node.id), self._symbol('^' + node.id)
 
     def visit_Num(self, node):
         return node.n, 0
@@ -186,13 +186,13 @@ class NodeVerifier(ast.NodeVisitor):
         if isinstance(node.value, ast.Call) and node.value.func.id == 'Laplace':
             pass
         elif len(node.targets) == 1 and isinstance(node.targets[0], ast.Name):
-            target_type = self.__type_map[node.targets[0].id]
+            target_type = self._type_map[node.targets[0].id]
             if isinstance(target_type, ListType):
                 # TODO: list assignment
                 pass
                 # raise NotImplementedError('List assignment not implemented.')
             else:
-                self.__checks.append(self.visit(node.targets[0])[1] == self.visit(node.value)[1])
+                self._checks.append(self.visit(node.targets[0])[1] == self.visit(node.value)[1])
         else:
             raise NotImplementedError('Currently don\'t support multiple assignment.')
 
@@ -203,11 +203,11 @@ class NodeVerifier(ast.NodeVisitor):
     def visit_Call(self, node):
         if isinstance(node.func, ast.Attribute) and node.func.attr == 'append':
             # type check
-            assert isinstance(self.__type_map[node.func.value.id], ListType), \
+            assert isinstance(self._type_map[node.func.value.id], ListType), \
                 '%s is not typed as list.' % node.func.value.id
-            if isinstance(self.__type_map[node.func.value.id].elem_type, NumType):
-                self.__declarations.append(self.visit(node.func.value.id)[1][self.__symbol('i')] ==
-                                           self.visit(node.args[0])[1])
+            if isinstance(self._type_map[node.func.value.id].elem_type, NumType):
+                self._declarations.append(self.visit(node.func.value.id)[1][self._symbol('i')] ==
+                                          self.visit(node.args[0])[1])
 
         else:
             # TODO: check the function return type.
@@ -225,26 +225,8 @@ def verify(tree):
     for node in ast.walk(tree):
         if isinstance(node, ast.FunctionDef):
             # TODO: consider multiple functions scenario
-            constraints = {
-                'precondition': [],
-                'declarations': [],
-                'checks': [],
-            }
-            NodeVerifier(constraints).visit(node)
-            final_constraints = z3.And(z3.And(constraints['precondition']), z3.And(constraints['declarations']),
-                                       z3.Not(z3.And(constraints['checks'])))
-            """
-            print('\033[32;1mPrecondition:\033[0m')
-            for constraint in constraints['precondition']:
-                print('    ' + str(constraint))
-            print('\033[32;1mDeclarations:\033[0m')
-            for constraint in constraints['declarations']:
-                print('    ' + str(constraint))
-            print('\033[32;1mChecks:\033[0m')
-            for constraint in constraints['checks']:
-                print('    ' + str(constraint))
-            """
-
+            verifier = NodeVerifier()
+            verifier.visit(node)
             s = z3.Solver()
-            s.add(final_constraints)
-            return True if s.check() == z3.sat else False, str(final_constraints)
+            s.add(verifier.get_constraint())
+            return (True if s.check() == z3.sat else False), str(verifier.get_constraint())
