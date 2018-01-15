@@ -50,7 +50,7 @@ class NodeVerifier(ast.NodeVisitor):
         self.__checks = constraints['checks']
         self.__type_map = None
 
-    def __symbol(self, name):
+    def _symbol(self, name):
         lightdp_type = self.__type_map[name]
         if isinstance(lightdp_type, NumType):
             return z3.Real(name)
@@ -95,11 +95,11 @@ class NodeVerifier(ast.NodeVisitor):
                 constraint = None
                 if isinstance(var_type, NumType):
                     self.__type_map['^' + name] = NumType(0)
-                    constraint = self.__symbol('^' + name) == \
+                    constraint = self._symbol('^' + name) == \
                                  self.visit(self.parse_expr(var_type.value))[0]
                 elif isinstance(var_type, BoolType):
                     self.__type_map['^' + name] = NumType(0)
-                    constraint = self.__symbol('^' + name) == \
+                    constraint = self._symbol('^' + name) == \
                                  self.visit(self.parse_expr('0'))[0]
                 elif isinstance(var_type, FunctionType):
                     # TODO: consider FunctionType
@@ -107,12 +107,12 @@ class NodeVerifier(ast.NodeVisitor):
                 elif isinstance(var_type, ListType):
                     # TODO: consider list inside list
                     self.__type_map['^' + name] = ListType(NumType(0))
-                    symbol_i = self.__symbol('i')
+                    symbol_i = self._symbol('i')
                     if isinstance(var_type.elem_type, NumType) and var_type.elem_type.value != '*':
-                        constraint = self.__symbol('^' + name)[symbol_i] == \
+                        constraint = self._symbol('^' + name)[symbol_i] == \
                                      self.visit(self.parse_expr(var_type.elem_type.value))[0]
                     elif isinstance(var_type.elem_type, BoolType):
-                        constraint = self.__symbol('^' + name)[symbol_i] == \
+                        constraint = self._symbol('^' + name)[symbol_i] == \
                                      self.visit(self.parse_expr('0'))[0]
                 if constraint is not None:
                     self.__declarations.append(constraint)
@@ -123,10 +123,10 @@ class NodeVerifier(ast.NodeVisitor):
             pre_constraint = self.visit(self.parse_expr(precondition.replace('^', '')))[0]
             for distance_var in distance_vars:
                 pre_constraint = z3.substitute(pre_constraint,
-                                               (self.__symbol(distance_var), self.__symbol('^' + distance_var)))
+                                               (self._symbol(distance_var), self._symbol('^' + distance_var)))
 
             if forall_vars is not None:
-                pre_constraint = z3.ForAll([self.__symbol(var) for var in forall_vars], pre_constraint)
+                pre_constraint = z3.ForAll([self._symbol(var) for var in forall_vars], pre_constraint)
 
             del self.__precondition[:]
             self.__precondition.append(pre_constraint)
@@ -156,7 +156,7 @@ class NodeVerifier(ast.NodeVisitor):
 
     def visit_Name(self, node):
         assert node.id in self.__type_map, 'Undefined %s' % node.id
-        return self.__symbol(node.id), self.__symbol('^' + node.id)
+        return self._symbol(node.id), self._symbol('^' + node.id)
 
     def visit_Num(self, node):
         return node.n, 0
@@ -206,7 +206,7 @@ class NodeVerifier(ast.NodeVisitor):
             assert isinstance(self.__type_map[node.func.value.id], ListType), \
                 '%s is not typed as list.' % node.func.value.id
             if isinstance(self.__type_map[node.func.value.id].elem_type, NumType):
-                self.__declarations.append(self.visit(node.func.value.id)[1][self.__symbol('i')] ==
+                self.__declarations.append(self.visit(node.func.value.id)[1][self._symbol('i')] ==
                                            self.visit(node.args[0])[1])
 
         else:
