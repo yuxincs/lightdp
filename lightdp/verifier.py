@@ -228,5 +228,5 @@ def verify(tree):
             verifier = NodeVerifier()
             verifier.visit(node)
             s = z3.Solver()
-            return True if s.check() == z3.sat else False, str(final_constraints)
             s.add(verifier.get_constraint())
+            return (True if s.check() == z3.sat else False), str(verifier.get_constraint())
