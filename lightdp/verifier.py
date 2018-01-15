@@ -38,20 +38,17 @@ class NodeVerifier(ast.NodeVisitor):
     """
     Walks through the :py:class:`ast.AST` and generate constraints to be solved by z3.
     """
-    def __init__(self, constraints):
+    def __init__(self):
         """
         Initialization of :py:class:`NodeVerifier`.
-
-        :param constraints: The map object to be passed in the verifier, this map MUST contain three keys: precondition/declarations/checks.
         """
-        assert isinstance(constraints, dict)
-        self._precondition = constraints['precondition']
-        self._declarations = constraints['declarations']
-        self._checks = constraints['checks']
+        self._precondition = []
+        self._declarations = []
+        self._checks = []
         self._type_map = None
 
     def get_constraint(self):
-
+        return z3.And(z3.And(self._precondition), z3.And(self._declarations), z3.Not(z3.And(self._checks)))
 
     def _symbol(self, name):
         lightdp_type = self._type_map[name]
@@ -228,26 +225,8 @@ def verify(tree):
     for node in ast.walk(tree):
         if isinstance(node, ast.FunctionDef):
             # TODO: consider multiple functions scenario
-            constraints = {
-                'precondition': [],
-                'declarations': [],
-                'checks': [],
-            }
-            NodeVerifier(constraints).visit(node)
-            final_constraints = z3.And(z3.And(constraints['precondition']), z3.And(constraints['declarations']),
-                                       z3.Not(z3.And(constraints['checks'])))
-            """
-            print('\033[32;1mPrecondition:\033[0m')
-            for constraint in constraints['precondition']:
-                print('    ' + str(constraint))
-            print('\033[32;1mDeclarations:\033[0m')
-            for constraint in constraints['declarations']:
-                print('    ' + str(constraint))
-            print('\033[32;1mChecks:\033[0m')
-            for constraint in constraints['checks']:
-                print('    ' + str(constraint))
-            """
-
+            verifier = NodeVerifier()
+            verifier.visit(node)
             s = z3.Solver()
-            s.add(final_constraints)
             return True if s.check() == z3.sat else False, str(final_constraints)
+            s.add(verifier.get_constraint())
