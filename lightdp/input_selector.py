@@ -4,7 +4,6 @@ from lightdp.typing import *
 from .verifier import NodeVerifier
 
 
-def generate_inputs(tree):
 class CounterExampleGenerator(NodeVerifier):
     def __init__(self, args):
         super(CounterExampleGenerator, self).__init__()
@@ -82,8 +81,28 @@ class CounterExampleGenerator(NodeVerifier):
             return super(CounterExampleGenerator, self).visit_Subscript(node)
 
 
+def generate_inputs(tree, check_array):
     import _ast
     assert isinstance(tree, _ast.AST)
+    generator = CounterExampleGenerator({'T': 10})
+    generator.visit(tree)
+    constraint, checks, db_var, db_distance_var = generator.get_constraint()
+
     d1 = []
     d2 = []
+    s = z3.Solver()
+
+    for i in range(len(check_array)):
+        s.push()
+        s.add(z3.And(constraint, z3.And(checks) if check_array[i] else z3.Not(z3.And(checks))))
+        if s.check() == z3.sat:
+            d1.append(float(s.model()[db_var].as_decimal(5)))
+            d2.append(float(s.model()[db_var].as_decimal(5)) + float(s.model()[db_distance_var].as_decimal(5)))
+            s.pop()
+            s.add(z3.Or(db_var != s.model()[db_var], db_distance_var != s.model()[db_distance_var]))
+        else:
+            print('not sat')
+            s.pop()
+
     return d1, d2
+
