@@ -1,6 +1,6 @@
 import ast
 from lightdp import __doc__
-from lightdp import verifier, transformer
+from lightdp import verifier, transformer, input_selector
 
 
 def main():
@@ -28,6 +28,10 @@ def main():
     with open(results.file, 'r') as f:
         tree = ast.parse(f.read())
         is_sat, constraints = verifier.verify(tree)
+
+        import random
+        check_array = [random.randint(0, 1) == 0 for _ in range(10)]
+        input_selector.generate_inputs(tree, check_array)
         transformed = None
         if not is_sat:
             with open(results.out, 'w') as out:
