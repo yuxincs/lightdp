@@ -35,9 +35,6 @@ class Sampler:
     def get_weight(self):
         return self.weight
 
-    def set_weight(self, w):
-        self.weight = w
-
     def add_config(self, new, f=lambda x: x, g=lambda x: x):
         self.rng = get_rng(new)
         self.pdf = get_pdf(new)
@@ -57,15 +54,3 @@ class Sampler:
         r = self.rng(m, s)
         self.weight *= stats.norm.pdf(r, m, s) / self.pdf(r, m, s)
         return r
-
-
-#    def laplace(self, loc=0.0, scale=1.0):
-#        r = numpy.random.laplace(loc, scale)
-#        self.weight *= stattest.laplace.pdf(r, loc, scale) / self.base.pdf(r, loc, scale)
-#        return r
-
-#    def normal(self, loc=0.0, scale=1.0):
-#        r = numpy.random.normal(loc, scale)
-#        self.weight *= stattest.norm.pdf(r, loc, scale) / self.base.pdf(r, loc, scale)
-#        return r
-
