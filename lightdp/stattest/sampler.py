@@ -21,8 +21,7 @@ def get_pdf(rng):
 
 
 class Sampler:
-
-    def __init__(self, config = 'laplace'):
+    def __init__(self, config='laplace'):
         try:
             self.rng = get_rng(config)
             self.pdf = get_pdf(config)
@@ -39,7 +38,7 @@ class Sampler:
     def set_weight(self, w):
         self.weight = w
 
-    def add_config(self, new, f = lambda x: x, g = lambda x: x):
+    def add_config(self, new, f=lambda x: x, g=lambda x: x):
         self.rng = get_rng(new)
         self.pdf = get_pdf(new)
         self.mu = f
