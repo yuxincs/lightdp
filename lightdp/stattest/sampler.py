@@ -62,11 +62,11 @@ class Sampler:
 
 #    def laplace(self, loc=0.0, scale=1.0):
 #        r = numpy.random.laplace(loc, scale)
-#        self.weight *= stats.laplace.pdf(r, loc, scale) / self.base.pdf(r, loc, scale)
+#        self.weight *= stattest.laplace.pdf(r, loc, scale) / self.base.pdf(r, loc, scale)
 #        return r
 
 #    def normal(self, loc=0.0, scale=1.0):
 #        r = numpy.random.normal(loc, scale)
-#        self.weight *= stats.norm.pdf(r, loc, scale) / self.base.pdf(r, loc, scale)
+#        self.weight *= stattest.norm.pdf(r, loc, scale) / self.base.pdf(r, loc, scale)
 #        return r
 
