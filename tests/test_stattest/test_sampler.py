@@ -1,9 +1,9 @@
 import pytest
-from lightdp.stattest import sampler
+import lightdp
 
 
 def test_prng():
-    prng = sampler.Sampler()
+    prng = lightdp.stattest.Sampler()
     assert isinstance(prng.laplace(0, 1), float)
     assert prng.weight() == 1
     prng.add_config('laplace', 'normal')
