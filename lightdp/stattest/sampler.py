@@ -2,55 +2,44 @@ import numpy
 from scipy import stats
 
 
-def get_rng(rng):
-    if rng == 'laplace':
-        return numpy.random.laplace
-    elif rng == 'normal':
-        return numpy.random.normal
-    else:
-        raise ValueError('Unknown distribution')
-
-
-def get_pdf(rng):
-    if rng == 'laplace':
-        return stats.laplace.pdf
-    elif rng == 'normal':
-        return stats.norm.pdf
-    else:
-        raise ValueError('Unknown distribution')
-
-
 class Sampler:
-    def __init__(self, config='laplace'):
-        try:
-            self.rng = get_rng(config)
-            self.pdf = get_pdf(config)
-        except ValueError as err:
-            print(err.args)
-            exit(1)
+    def __init__(self):
+        self._configs = {}
+
         self._weight = 1
-        self.mu = lambda x: x
-        self.sigma = lambda x: x
+
+        self._sample_map = {
+            'laplace': numpy.random.laplace,
+            'normal': numpy.random.normal
+        }
+
+        self._pdf_map = {
+            'laplace': stats.laplace.pdf,
+            'normal': stats.norm.pdf
+        }
 
     def weight(self):
         return self._weight
 
-    def add_config(self, new, f=lambda x: x, g=lambda x: x):
-        self.rng = get_rng(new)
-        self.pdf = get_pdf(new)
-        self.mu = f
-        self.sigma = g
+    def add_config(self, old, new, f=lambda x: x, g=lambda x: x):
+        assert isinstance(old, str) and old in self._sample_map, old + ' sampling mechanism not supported.'
+        assert isinstance(old, str) and new in self._sample_map, new + ' sampling mechanism not supported.'
+        self._configs[old] = (new, f, g)
+
+    def _sample(self, mech, loc=0.0, scale=1.0):
+        assert isinstance(mech, str) and mech in self._sample_map
+
+        if mech in self._configs:
+            new_mech, f, g = self._configs[mech]
+            new_loc, new_scale = f(loc), g(scale)
+            res = self._sample_map[new_mech](new_loc, new_scale)
+            self._weight *= \
+                self._pdf_map[mech](res, new_loc, new_scale) / self._pdf_map[new_mech](res, new_loc, new_scale)
+        else:
+            return self._sample_map[mech](loc, scale)
 
     def laplace(self, loc=0.0, scale=1.0):
-        m = self.mu(loc)
-        s = self.sigma(scale)
-        r = self.rng(m, s)
-        self._weight *= stats.laplace.pdf(r, m, s) / self.pdf(r, m, s)
-        return r
+        return self._sample_map('laplace', loc, scale)
 
     def normal(self, loc=0.0, scale=1.0):
-        m = self.mu(loc)
-        s = self.sigma(scale)
-        r = self.rng(m, s)
-        self._weight *= stats.norm.pdf(r, m, s) / self.pdf(r, m, s)
-        return r
+        return self._sample_map('normal', loc, scale)
