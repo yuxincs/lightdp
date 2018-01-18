@@ -35,6 +35,7 @@ class Sampler:
             res = self._sample_map[new_mech](new_loc, new_scale)
             self._weight *= \
                 self._pdf_map[mech](res, new_loc, new_scale) / self._pdf_map[new_mech](res, new_loc, new_scale)
+            return res
         else:
             return self._sample_map[mech](loc, scale)
 
