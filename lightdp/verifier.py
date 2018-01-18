@@ -71,8 +71,8 @@ class NodeVerifier(ast.NodeVisitor):
     @staticmethod
     def parse_docstring(s):
         assert s is not None
-        from lightdp.lexer import build_lexer
-        from lightdp.parser import build_parser
+        from .lexer import build_lexer
+        from .parser import build_parser
         lexer = build_lexer()
         parser = build_parser()
         return parser.parse(s, lexer=lexer)
