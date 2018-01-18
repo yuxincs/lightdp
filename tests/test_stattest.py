@@ -1,5 +1,5 @@
 import pytest
-from lightdp.stats import sampler, gauss, lapmech, nm
+from lightdp.stattest import sampler, gauss, lapmech, nm
 
 
 def test_prng():
