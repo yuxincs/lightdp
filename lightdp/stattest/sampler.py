@@ -39,7 +39,7 @@ class Sampler:
             return self._sample_map[mech](loc, scale)
 
     def laplace(self, loc=0.0, scale=1.0):
-        return self._sample_map('laplace', loc, scale)
+        return self._sample('laplace', loc, scale)
 
     def normal(self, loc=0.0, scale=1.0):
-        return self._sample_map('normal', loc, scale)
+        return self._sample('normal', loc, scale)
