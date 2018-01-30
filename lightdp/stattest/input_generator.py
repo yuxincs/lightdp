@@ -1,7 +1,7 @@
 import ast
 import z3
 from lightdp.typing import *
-from .verifier import NodeVerifier
+from lightdp.verifier import NodeVerifier
 
 
 class InputGenerator(NodeVerifier):
