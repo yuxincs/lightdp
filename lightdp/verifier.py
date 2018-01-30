@@ -44,11 +44,13 @@ class NodeVerifier(ast.NodeVisitor):
         """
         self._precondition = []
         self._declarations = []
-        self._checks = []
+        self._if_checks = []
+        self._assign_checks = []
         self._type_map = None
 
     def get_constraint(self):
-        return z3.And(z3.And(self._precondition), z3.And(self._declarations), z3.Not(z3.And(self._checks)))
+        return z3.And(z3.And(self._precondition), z3.And(self._declarations),
+                      z3.Not(z3.And(z3.And(self._if_checks), z3.And(self._assign_checks))))
 
     def _symbol(self, name):
         lightdp_type = self._type_map[name]
@@ -132,18 +134,19 @@ class NodeVerifier(ast.NodeVisitor):
             self._precondition.append(pre_constraint)
 
             # empty the check list
-            del self._checks[:]
+            del self._if_checks[:]
+            del self._assign_checks[:]
 
             self.generic_visit(node)
 
     def visit_If(self, node):
         test_node = self.visit(node.test)
-        self._checks.append(test_node[0] == test_node[1])
+        self._if_checks.append(test_node[0] == test_node[1])
         self.generic_visit(node)
 
     def visit_IfExp(self, node):
         test_node = self.visit(node.test)
-        self._checks.append(test_node[0] == test_node[1])
+        self._if_checks.append(test_node[0] == test_node[1])
         return z3.If(test_node[0], self.visit(node.body)[0], self.visit(node.orelse)[0]), \
                z3.If(test_node[1], self.visit(node.body)[1], self.visit(node.orelse)[1])
 
@@ -192,7 +195,7 @@ class NodeVerifier(ast.NodeVisitor):
                 pass
                 # raise NotImplementedError('List assignment not implemented.')
             else:
-                self._checks.append(self.visit(node.targets[0])[1] == self.visit(node.value)[1])
+                self._assign_checks.append(self.visit(node.targets[0])[1] == self.visit(node.value)[1])
         else:
             raise NotImplementedError('Currently don\'t support multiple assignment.')
 

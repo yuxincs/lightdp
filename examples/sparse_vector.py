@@ -1,4 +1,4 @@
-def SparseVector(T, N, len, epsilon, q):
+def SparseVector(epsilon, T, N, len, q):
     """
     precondition : forall i (^q[i] >= -1 and ^q[i] <= 1);
     T, N, len, epsilon : num(0); q : list num(*); out : list bool;
