@@ -1,5 +1,6 @@
 from inspect import isfunction
 
+
 def s_selector(algorithm):
     assert isfunction(algorithm)
     if algorithm.__name__ == 'noisymax':
