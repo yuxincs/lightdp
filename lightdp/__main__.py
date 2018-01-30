@@ -1,6 +1,6 @@
 import ast
 from lightdp import __doc__
-from lightdp import verifier, transformer, input_selector
+from lightdp import verifier, transformer, input_generator
 
 
 def main():
@@ -31,7 +31,8 @@ def main():
 
         import random
         check_array = [random.randint(0, 1) == 0 for _ in range(10)]
-        input_selector.generate_inputs(tree, check_array)
+        d1 = [(9 + 2 * random.random()) for _ in range(10)]
+        input_generator.generate_inputs(tree, {'T': 10}, 10, d1)
         transformed = None
         if not is_sat:
             with open(results.out, 'w') as out:
