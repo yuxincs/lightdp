@@ -43,6 +43,7 @@ def hypothesis_test(algorithm, args, kwargs, eps, D1, D2, S, test_stat, sig_test
     :param sig_test_stat: Significance statistical test function
     :return:
     """
+    np.random.seed(int(codecs.encode(os.urandom(4), 'hex'), 16))
     if cores == 1:
         sum1, sum2 = _core_hypothesis_test(algorithm, args, kwargs, eps, D1, D2, S,
                                            test_stat, sig_test_stat, iterations)
