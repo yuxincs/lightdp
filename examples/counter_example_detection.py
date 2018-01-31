@@ -22,12 +22,16 @@ def main():
 
     D2 = [9.91737, 10.0, 10.0, 10.31766, 8.39766, 9.62791, 9.99999, 10.48255, 9.99999, 9.86943]
     """
+    with open('./result.txt', 'w') as f:
+        for eps in [x / 10.0 for x in range(45, 80, 1)]:
+            avg_p1, avg_p2 = 0, 0
+            for _ in range(5):
+                p1, p2 = hypothesis_test(noisymax, (), {'eps': eps}, 2, D1, D2,
+                                         s_selector(noisymax), test_stat, sig_test_stat, 100000, 1)
+                avg_p1 += p1
+                avg_p2 += p2
 
-    for eps in [x / 10.0 for x in range(60, 90, 1)]:
-        p1, p2 = hypothesis_test(noisymax, (), {'eps': eps}, 2, D1, D2,
-                                 s_selector(noisymax), test_stat, sig_test_stat, 10000, 1)
-
-        print(eps, p1, p2)
+            f.write("%f %f %f\n" % (eps, avg_p1 / 5, avg_p2 / 5))
 
 
 if __name__ == '__main__':
