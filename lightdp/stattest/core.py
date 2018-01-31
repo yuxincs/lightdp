@@ -36,12 +36,16 @@ def hypothesis_test(algorithm, args, kwargs, eps, D1, D2, S, test_stat, sig_test
     """
     :param algorithm: The algorithm to run on
     :param args: The arguments the algorithm needs
+    :param kwargs: The keyword arguments the algorithm needs
+    :param eps: The epsilon value for test stat function
     :param D1: Database 1
     :param D2: Databse 2
+    :param S: The S set
     :param iterations: Number of iterations to run
     :param test_stat: Statistical test function
     :param sig_test_stat: Significance statistical test function
-    :return:
+    :param cores: Number of processes to run, default is 1 and 0 means utilizing all cores.
+    :return: (p1, p2)
     """
     np.random.seed(int(codecs.encode(os.urandom(4), 'hex'), 16))
     if cores == 1:
