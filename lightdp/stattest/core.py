@@ -1,3 +1,8 @@
+import numpy as np
+import multiprocessing as mp
+import math
+import codecs
+import os
 
 
 def _core_hypothesis_test(algorithm, args, kwargs, eps, D1, D2, S, test_stat, sig_test_stat, iterations):
@@ -9,7 +14,7 @@ def _core_hypothesis_test(algorithm, args, kwargs, eps, D1, D2, S, test_stat, si
     # compute test statistic T
     x, y = [], []
 
-    for i in range(iterations):
+    for _ in range(iterations):
         a = algorithm(D1, *args, **kwargs)
         b = algorithm(D2, *args, **kwargs)
         if a in S:
@@ -39,15 +44,14 @@ def hypothesis_test(algorithm, args, kwargs, eps, D1, D2, S, test_stat, sig_test
     :return:
     """
     if cores == 1:
-        eps, sum1, sum2 = _core_hypothesis_test(algorithm, args, kwargs, eps, D1, D2, S,
-                                                test_stat, sig_test_stat, iterations)
+        sum1, sum2 = _core_hypothesis_test(algorithm, args, kwargs, eps, D1, D2, S,
+                                           test_stat, sig_test_stat, iterations)
         return float(sum1) / iterations, float(sum2) / iterations
     else:
         def process_hypothesis_test(algorithm, args, kwargs, eps, D1, D2, S, test_stat, sig_test_stat, iterations, result_queue):
+            np.random.seed(int(codecs.encode(os.urandom(4), 'hex'), 16))
             result_queue.put(_core_hypothesis_test(algorithm, args, kwargs, eps, D1, D2, S, test_stat, sig_test_stat, iterations))
 
-        import multiprocessing as mp
-        import math
         process_count = mp.cpu_count() if cores == 0 else cores
         result_queue = mp.Queue()
 
@@ -56,7 +60,8 @@ def hypothesis_test(algorithm, args, kwargs, eps, D1, D2, S, test_stat, sig_test
             process_iterations = int(math.floor(float(iterations) / process_count))
             process_iterations += iterations % process_iterations if p_id == process_count - 1 else 0
             process = mp.Process(target=process_hypothesis_test,
-                                 args=(algorithm, args, kwargs, eps, D1, D2, S, test_stat, sig_test_stat, process_iterations))
+                                 args=(algorithm, args, kwargs, eps, D1, D2, S, test_stat, sig_test_stat,
+                                       process_iterations, result_queue))
             processes.append(process)
             process.start()
 
