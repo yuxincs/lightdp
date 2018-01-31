@@ -77,6 +77,3 @@ def hypothesis_test(algorithm, args, kwargs, eps, D1, D2, S, test_stat, sig_test
             total_sum2 += sum2
 
         return float(total_sum1) / iterations, float(total_sum2) / iterations
-
-
-
