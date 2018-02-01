@@ -1,4 +1,4 @@
-from lightdp.stattest import hypothesis_test, test_stat, sig_test_stat, generate_inputs, s_selector
+from lightdp.stattest import hypothesis_test, test_stat, sig_test_stat, generate_inputs, difference_s_selector
 from lightdp.stattest.algorithms import noisymax, sparsevector
 
 
@@ -22,12 +22,16 @@ def main():
 
     D2 = [9.91737, 10.0, 10.0, 10.31766, 8.39766, 9.62791, 9.99999, 10.48255, 9.99999, 9.86943]
     """
+
+    args = ()
     with open('./result.txt', 'w') as f:
-        for eps in [x / 10.0 for x in range(45, 80, 1)]:
+        for eps in [x / 10.0 for x in range(20, 50, 1)]:
+            kwargs = {'eps': eps}
             avg_p1, avg_p2 = 0, 0
             for _ in range(5):
-                p1, p2 = hypothesis_test(noisymax, (), {'eps': eps}, 2, D1, D2,
-                                         s_selector(noisymax), test_stat, sig_test_stat, 100000, 1)
+                p1, p2 = hypothesis_test(noisymax, args, kwargs, 2, D1, D2,
+                                         difference_s_selector(noisymax, args, kwargs, D1, D2),
+                                         test_stat, sig_test_stat, 1000, 1)
                 avg_p1 += p1
                 avg_p2 += p2
 
