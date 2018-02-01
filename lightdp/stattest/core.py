@@ -22,12 +22,12 @@ def _core_hypothesis_test(algorithm, args, kwargs, eps, D1, D2, S, test_stat, si
         if b in S:
             y.append(b)
 
-    T1 = test_stat(x, y, iterations, eps)
-    T2 = test_stat(y, x, iterations, eps)
+    T1 = test_stat(x, y, eps)
+    T2 = test_stat(y, x, eps)
 
     # compute significance of the value of T
     R = x + y
-    ti = [sig_test_stat(R, eps, iterations) for _ in range(iterations)]
+    ti = [sig_test_stat(R, eps) for _ in range(iterations)]
 
     return sum([x >= T1 for x in ti]), sum([x >= T2 for x in ti])
 
