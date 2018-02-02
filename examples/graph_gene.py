@@ -1,23 +1,22 @@
 import matplotlib.pyplot as plt
 
 
+def graph_gene(xlabel, ylabel, data, title, name):
+    x = [i[0] for i in data]
+    p1 = [i[1] for i in data]
+    p2 = [i[2] for i in data]
 
-def graph_gene(xlabel,ylabel,data,title,name):
-    x=[i[0] for i in data]
-    p1=[i[1] for i in data]
-    p2=[i[2] for i in data]
+    plt.plot(x, p1, 'o-', label='p1', markersize=2)
+    plt.plot(x, p2, 'o-', label='p2', markersize=2)
+    plt.axhline(y=0.5, color='black', linestyle='dashed')
+    plt.axhline(y=0.05, color='green', linestyle='dashed', alpha=0.8)
+    plt.axhline(y=0.01, color='red', linestyle='dashed', alpha=0.8)
 
-    plt.plot(x,p1,label='p1')
-    plt.plot(x,p2,label='p2')
-    plt.axhline(y=0.05, color='r',linestyle='o-',label='p=0.05')
-    plt.axhline(y=0.01, color='y',linestyle='o-',label='p=0.01')
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
-    plt.legend()
-
+    plt.legend(loc=3)
     plt.savefig(name)
-
     plt.show()
     return
 
