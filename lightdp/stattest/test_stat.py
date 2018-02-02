@@ -1,14 +1,18 @@
 import numpy as np
 
 
-def test_stat(x, y, eps):
+def difference_test_stat(x, y, eps):
     """
         Function to compute test statistic T
     :param x: input array
     :param y: input array
     :return: T
     """
-    return (len(x)) - (np.exp(eps)) * (len(y))  # one of the options
+    return (len(x)) - (np.exp(eps)) * (len(y))
+
+
+def division_test_stat(c):
+    return lambda x, y, eps: (len(x) + c) / (len(y) + c)
 
 
 def sig_test_stat(R, eps):

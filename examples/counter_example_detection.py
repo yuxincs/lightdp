@@ -1,4 +1,5 @@
-from lightdp.stattest import hypothesis_test, test_stat, sig_test_stat, generate_inputs, difference_s_selector
+from lightdp.stattest import hypothesis_test, difference_test_stat, division_test_stat, \
+    sig_test_stat, generate_inputs, difference_s_selector
 from lightdp.stattest.algorithms import noisymax, sparsevector
 
 
@@ -24,18 +25,16 @@ def main():
     """
 
     args = ()
-    with open('./result.txt', 'w') as f:
-        for eps in [x / 10.0 for x in range(20, 50, 1)]:
-            kwargs = {'eps': eps}
-            avg_p1, avg_p2 = 0, 0
-            for _ in range(5):
-                p1, p2 = hypothesis_test(noisymax, args, kwargs, 2, D1, D2,
-                                         difference_s_selector(noisymax, args, kwargs, D1, D2),
-                                         test_stat, sig_test_stat, 1000, 1)
-                avg_p1 += p1
-                avg_p2 += p2
-
-            f.write("%f %f %f\n" % (eps, avg_p1 / 5, avg_p2 / 5))
+    for eps in [x / 10.0 for x in range(29, 50, 1)]:
+        kwargs = {'eps': eps}
+        avg_p1, avg_p2 = 0, 0
+        for i in range(5):
+            p1, p2 = hypothesis_test(noisymax, args, kwargs, 2, D1, D2,
+                                     difference_s_selector(noisymax, args, kwargs, D1, D2),
+                                     difference_test_stat, sig_test_stat, 100000, 0)
+            avg_p1 += p1
+            avg_p2 += p2
+        print("%f %f %f\n" % (eps, avg_p1 / 5, avg_p2 / 5))
 
 
 if __name__ == '__main__':
