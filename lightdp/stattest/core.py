@@ -39,7 +39,7 @@ def hypothesis_test(algorithm, args, kwargs, eps, D1, D2, S, test_stat, sig_test
     :param kwargs: The keyword arguments the algorithm needs
     :param eps: The epsilon value for test stat function
     :param D1: Database 1
-    :param D2: Databse 2
+    :param D2: Database 2
     :param S: The S set
     :param iterations: Number of iterations to run
     :param test_stat: Statistical test function

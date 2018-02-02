@@ -1,6 +1,5 @@
 from inspect import isfunction
 from collections import Counter
-import math
 
 
 def frequency_s_selector(algorithm, args, kwargs, D1, D2, iterations=1000):
@@ -8,7 +7,12 @@ def frequency_s_selector(algorithm, args, kwargs, D1, D2, iterations=1000):
     if algorithm.__name__ == 'noisymax':
         return [8, 4, 0]
     if algorithm.__name__ == 'sparsevector':
-        return [9]
+        a = [algorithm(D1, *args, **kwargs) for _ in range(1000)]
+        b = [algorithm(D2, *args, **kwargs) for _ in range(1000)]
+
+        countitem = Counter(a + b).most_common(2)
+
+        return [countitem[0][0], countitem[1][0]]
 
 
 def difference_s_selector(algorithm, args, kwargs, D1, D2, iterations=1000):
