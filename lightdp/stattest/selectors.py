@@ -4,15 +4,12 @@ from collections import Counter
 
 def frequency_s_selector(algorithm, args, kwargs, D1, D2, iterations=1000):
     assert isfunction(algorithm)
-    if algorithm.__name__ == 'noisymax':
-        return [8, 4, 0]
-    if algorithm.__name__ == 'sparsevector':
-        a = [algorithm(D1, *args, **kwargs) for _ in range(1000)]
-        b = [algorithm(D2, *args, **kwargs) for _ in range(1000)]
+    a = [algorithm(D1, *args, **kwargs) for _ in range(iterations)]
+    b = [algorithm(D2, *args, **kwargs) for _ in range(iterations)]
 
-        countitem = Counter(a + b).most_common(2)
+    countitem = Counter(a + b).most_common(2)
 
-        return [countitem[0][0], countitem[1][0]]
+    return [countitem[0][0], countitem[1][0]]
 
 
 def difference_s_selector(algorithm, args, kwargs, D1, D2, iterations=1000):
