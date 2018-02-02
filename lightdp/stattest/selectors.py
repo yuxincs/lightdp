@@ -32,4 +32,4 @@ def difference_s_selector(algorithm, args, kwargs, D1, D2, iterations=1000):
 
     diff = sorted(diff, key=lambda k: k[1], reverse=True)
 
-    return [diff[i][0] for i in range(2)]
+    return [diff[i][0] for i in range(1)]
