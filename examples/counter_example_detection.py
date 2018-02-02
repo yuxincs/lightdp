@@ -29,9 +29,9 @@ def main():
         kwargs = {'eps': eps}
         avg_p1, avg_p2 = 0, 0
         for i in range(5):
-            p1, p2 = hypothesis_test(noisymax, args, kwargs, 2, D1, D2,
+            p1, p2 = hypothesis_test(noisymax, args, kwargs, D1, D2,
                                      difference_s_selector(noisymax, args, kwargs, D1, D2),
-                                     difference_test_stat, sig_test_stat, 100000, 0)
+                                     difference_test_stat(2), sig_test_stat(2), 100000, 0)
             avg_p1 += p1
             avg_p2 += p2
         print("%f %f %f\n" % (eps, avg_p1 / 5, avg_p2 / 5))
