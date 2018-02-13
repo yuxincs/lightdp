@@ -31,7 +31,7 @@ def difference_s_selector(algorithm, args, kwargs, D1, D2, iterations=1000):
 
     return [diff[i][0] for i in range(1)]
     
-    def sd_s_selector(algorithm, args, kwargs, D1, D2, iterations=1000):
+def sd_s_selector(algorithm, args, kwargs, D1, D2, iterations=1000):
     assert isfunction(algorithm)
     a = [algorithm(D1, *args, **kwargs) for _ in range(iterations)]
     b = [algorithm(D2, *args, **kwargs) for _ in range(iterations)]
