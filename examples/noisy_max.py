@@ -1,7 +1,7 @@
 def noisymax(epsilon, N, q):
     """
     precondition : forall i (^q[i] >= -1 and ^q[i] <= 1);
-    q : list num(*); out : num(*); N : num(0);
+    q : list num(*); out : num(0); N : num(0);
     i, bq, cq : num(0); eta : num(-^q[i]); max_num : num(0)
     """
     out = 0
