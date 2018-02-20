@@ -97,8 +97,16 @@ class NodeVerifier(ast.NodeVisitor):
                 constraint = None
                 if isinstance(var_type, NumType):
                     self._type_map['^' + name] = NumType(0)
-                    constraint = self._symbol('^' + name) == \
-                                 self.visit(self.parse_expr(var_type.value))[0]
+
+                    if var_type.value != '*':
+                        # TODO: distance variables should be simpler
+                        distance_vars = re.findall(r"""\^([_a-zA-Z][0-9a-zA-Z_]*)""", var_type.value)
+                        constraint = self._symbol('^' + name) == \
+                                     self.visit(self.parse_expr(var_type.value.replace('^', '')))[0]
+                        for distance_var in distance_vars:
+                            constraint = z3.substitute(constraint,
+                                                       (self._symbol(distance_var), self._symbol('^' + distance_var)))
+
                 elif isinstance(var_type, BoolType):
                     self._type_map['^' + name] = NumType(0)
                     constraint = self._symbol('^' + name) == \

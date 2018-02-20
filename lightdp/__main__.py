@@ -1,6 +1,7 @@
 import ast
 from lightdp import __doc__
-from lightdp import verifier, transformer, input_generator
+from lightdp import verifier, transformer
+from lightdp.stattest import input_generator
 
 
 def main():
