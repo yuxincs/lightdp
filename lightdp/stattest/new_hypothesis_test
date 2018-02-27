@@ -1,0 +1,30 @@
+import numpy as np
+
+def test(cx,cy,eps):
+    counter=0
+    n=10000
+    for i in range(n):
+        r=np.random.binomial(cx,1/(np.exp(eps)))
+        t=np.random.binomial(cy+r,0.5)
+        if t>r:
+            counter+=1
+
+    return counter/n
+
+def main(algorithm,D1,D2,eps):
+    
+    ns=10000
+    nh=10000
+    xs=[algorithm(D1,eps) for _ in range(ns)]
+    ys=[algorithm(D2,eps) for _ in range(ns)]
+    S=sd_s_selector(xs,ys)
+    xh = [algorithm(D1, eps) for _ in range(nh)]
+    yh = [algorithm(D2, eps) for _ in range(nh)]
+    cx=len([x in S for x in xh ])
+    cy = len([y in S for y in yh])
+    if cx>cy:
+        p=test(cx,cy,eps)
+    else:
+        p = test(cy, cx, eps)
+
+    return p
