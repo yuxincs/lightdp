@@ -11,6 +11,7 @@ class InputGenerator(NodeVerifier):
         self._args = args
         self._db_var = None
         self._if_not_checks = []
+        self._dependent_loop_vars = []
 
     def visit_FunctionDef(self, node):
         self._db_var = node.args.args[-1].arg
@@ -63,6 +64,11 @@ class InputGenerator(NodeVerifier):
 
             self.generic_visit(node)
 
+    def visit_While(self, node):
+        if isinstance(node.body[0], ast.Expr) and isinstance(node.body[0].value, ast.Str):
+            self._dependent_loop_vars.extend(node.body[0].value.s.split(','))
+        self.generic_visit(node)
+
     def visit_Assign(self, node):
         if isinstance(node.value, ast.Call) and node.value.func.id == 'Laplace':
             self._declarations.append(self._symbol(node.targets[0].id) == 0)
@@ -80,13 +86,13 @@ class InputGenerator(NodeVerifier):
         else:
             raise NotImplementedError('Currently don\'t support multiple assignment.')
 
-        super(InputGenerator, self).visit_Assign(node)
-
     def get_constraint(self):
         for k, v in self._args.items():
             self._declarations.append(self._symbol(k) == v)
         final_constraint = z3.And(z3.And(self._precondition), z3.And(self._declarations), z3.And(self._assign_checks))
-        return final_constraint, self._if_checks, self._if_not_checks, self._symbol(self._db_var), self._symbol('^' + self._db_var)
+        return final_constraint, self._if_checks, self._if_not_checks, \
+            self._symbol(self._db_var), self._symbol('^' + self._db_var), \
+            [self._symbol(var) for var in self._dependent_loop_vars]
 
     def visit_Subscript(self, node):
         # substitute the list-typed db_var with a single variable
@@ -107,7 +113,7 @@ class InputGenerator(NodeVerifier):
         self._if_checks.append(test_node[0] == test_node[1])
         self._if_not_checks.append(test_node[0] != test_node[1])
         return z3.If(test_node[0], self.visit(node.body)[0], self.visit(node.orelse)[0]), \
-               z3.If(test_node[1], self.visit(node.body)[1], self.visit(node.orelse)[1])
+            z3.If(test_node[1], self.visit(node.body)[1], self.visit(node.orelse)[1])
 
 
 def generate_inputs(tree, args, num_input, fixed_d1=[]):
@@ -124,7 +130,7 @@ def generate_inputs(tree, args, num_input, fixed_d1=[]):
 
     generator = InputGenerator(args)
     generator.visit(tree)
-    constraint, checks, not_checks, db_var, db_distance_var = generator.get_constraint()
+    constraint, checks, not_checks, db_var, db_distance_var, loop_dependent_vars = generator.get_constraint()
 
     d1 = fixed_d1
     d2 = []
@@ -138,6 +144,11 @@ def generate_inputs(tree, args, num_input, fixed_d1=[]):
         s.add(db_var == d1[i])
         s.add(db_distance_var != 0)
         s.add(z3.And(checks) if check_array[i] else z3.And(not_checks))
+        try:
+            for loop_dependent_var in loop_dependent_vars:
+                s.add(loop_dependent_var == s.model()[loop_dependent_var])
+        except z3.Z3Exception:
+            pass
         if s.check() == z3.sat:
             d2.append(float(s.model()[db_var].as_decimal(5).replace('?', '')) +
                       float(s.model()[db_distance_var].as_decimal(5).replace('?', '')))
