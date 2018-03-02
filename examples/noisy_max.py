@@ -7,11 +7,10 @@ def noisymax(epsilon, N, q):
     out = 0
     i = 0
     bq = 0
-    cq = 0
     while i < N:
+        "bq"
         eta = Laplace(2 / epsilon)
-        cq = q[i] + eta
-        if cq > bq and i == 1:
+        if q[i] + eta > bq and i == 1:
             out = i
-            bq = cq
+            bq = q[i] + eta
         i = i + 1
