@@ -1,7 +1,6 @@
 import json
 import sys
 import os
-import wget
 import zipfile
 import shutil
 from functools import reduce
