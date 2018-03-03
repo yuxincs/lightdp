@@ -19,6 +19,9 @@ def main():
 
     results = arg_parser.parse_args()
 
+    if os.path.exists(results.output_dir + '/z3'):
+        exit('z3 folder exists in ' + os.path.abspath(results.output_dir))
+
     # detect os name
     system = sys.platform
     library_files = ['.txt', '.py']
