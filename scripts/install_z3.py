@@ -66,6 +66,7 @@ def main():
             shutil.move('./tmp/z3', results.output_dir)
             shutil.rmtree('./tmp')
             print('Done.')
+            break
 
 
 if __name__ == '__main__':
