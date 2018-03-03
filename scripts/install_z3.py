@@ -3,7 +3,6 @@ import sys
 import os
 import zipfile
 import shutil
-from functools import reduce
 try:
     import urllib.request as urlrequest
 except ImportError:
@@ -34,14 +33,25 @@ def main():
 
     # read from GitHub apis
     releases = json.loads(urlrequest.urlopen('https://api.github.com/repos/Z3Prover/z3/releases').read().decode('utf-8'))[0]
-    print('Downloading %s...' % releases['name'])
 
     for asset in releases['assets']:
         if system in asset['name'] and 'x64' in asset['name']:
             # download the release zip file
             os.mkdir('./tmp')
             os.mkdir('./tmp/z3')
-            wget.download(asset['browser_download_url'], out='./tmp/z3.zip')
+
+            def progress(count, block_size, total_size):
+                percent = (count * block_size) / total_size
+                progress_count = int(percent * 30)
+                dot_count = 30 - progress_count - 1
+                sys.stdout.write('Downloading %s ' % releases['name'])
+                sys.stdout.write('[' + progress_count * '=' + '>' +
+                                 dot_count * '.' + '] ' + '{: >3d}'.format(int(percent * 100)) + '%\r')
+                sys.stdout.flush()
+
+            urlrequest.urlretrieve(asset['browser_download_url'], './tmp/z3.zip', progress)
+            print('Downloading %s...' % releases['name'] + '[' + 29 * '=' + '>] 100%')
+
             print('Download finished. Extracting files...')
             zf = zipfile.ZipFile('./tmp/z3.zip')
             zf.extractall('./tmp')
