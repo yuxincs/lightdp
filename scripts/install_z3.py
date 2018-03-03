@@ -62,7 +62,7 @@ def main():
                     if file.endswith(library_file):
                         shutil.move('./tmp/' + file, './tmp/z3/' + file[file.rfind('/'):])
 
-            print('Extract finished, removing temporary files...')
+            print('Extract finished, Removing temporary files...')
             shutil.move('./tmp/z3', results.output_dir)
             shutil.rmtree('./tmp')
             print('Done.')
