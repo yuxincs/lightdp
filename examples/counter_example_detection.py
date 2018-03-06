@@ -23,18 +23,30 @@ def main():
 
     D2 = [9.91737, 10.0, 10.0, 10.31766, 8.39766, 9.62791, 9.99999, 10.48255, 9.99999, 9.86943]
     """
-
+    test_epsilon = 2
+    algorithm = noisymax
+    results = []
     args = ()
     for eps in [x / 10.0 for x in range(29, 50, 1)]:
         kwargs = {'eps': eps}
         avg_p1, avg_p2 = 0, 0
+        S = difference_s_selector(algorithm, args, kwargs, D1, D2)
         for i in range(5):
-            p1, p2 = hypothesis_test(noisymax, args, kwargs, D1, D2,
-                                     difference_s_selector(noisymax, args, kwargs, D1, D2),
-                                     difference_test_stat(2), sig_test_stat(2), 100000, 0)
+            p1, p2 = hypothesis_test(algorithm, args, kwargs, D1, D2,
+                                     S,
+                                     difference_test_stat(test_epsilon), sig_test_stat(test_epsilon), 100000, 0)
             avg_p1 += p1
             avg_p2 += p2
-        print("%f %f %f\n" % (eps, avg_p1 / 5, avg_p2 / 5))
+        print("epsilon: %f, p1 = %f, p2 = %f | S = %s" % (eps, avg_p1 / 5, avg_p2 / 5, S))
+        results.append((eps, avg_p1 / 5, avg_p2 / 5))
+
+    # print output
+    print("\nFinal Result:")
+    print("%s" % algorithm.__name__)
+    print("Test epsilon: %f" % test_epsilon)
+    print("D1 : %s" % D1)
+    print("D2 : %s" % D2)
+    print("[%s]" % (",".join(["[%f, %f, %f]\n" % result for result in results])))
 
 
 if __name__ == '__main__':

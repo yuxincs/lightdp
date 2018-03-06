@@ -12,8 +12,7 @@ def noisymax(Q, eps):
     return np.argmax(noisy_array)
 
 
-def sparsevector(Q, eps):
-    T=10
+def sparsevector(Q, eps, N, T):
     out = []
     eta1 = np.random.laplace(scale=2.0 / eps)
     Tbar = T + eta1
