@@ -3,16 +3,43 @@
 import numpy as np
 
 
-def noisymax(Q, eps):
+def noisy_max_v1(Q, eps):
 
     # add lapalce noise
-    noisy_array = [a + np.random.laplace(scale=1.0 / eps) for a in Q]
+    noisy_array = [a + np.random.laplace(scale=2.0 / eps) for a in Q]
 
-    # compare the largest noisy element and return the index of primal query along with the max value
+    # find the largest noisy element and return its index
     return np.argmax(noisy_array)
 
 
-def sparsevector(Q, eps, N, T):
+def noisy_max_v2(Q, eps):
+
+    # add lapalce noise
+    noisy_array = [a + np.random.laplace(scale=2.0 / eps) for a in Q]
+
+    # find the largest noisy element and return the its value
+    return max(noisy_array)
+
+
+def noisy_max_v3(Q, eps):
+
+    # add exponential noise
+    noisy_array = [a + np.random.exponential(scale=2.0 / eps) for a in Q]
+
+    # find the largest noisy element and return its index
+    return np.argmax(noisy_array)
+
+
+def noisy_max_v4(Q, eps):
+
+    # add exponential noise
+    noisy_array = [a + np.random.exponential(scale=2.0 / eps) for a in Q]
+
+    # find the largest noisy element and return its value
+    return max(noisy_array)
+
+
+def sparse_vector(Q, eps, N, T):
     out = []
     eta1 = np.random.laplace(scale=2.0 / eps)
     Tbar = T + eta1
@@ -27,4 +54,4 @@ def sparsevector(Q, eps, N, T):
             c2 += 1
         i += 1
 
-    return sum(out)
+    return out
