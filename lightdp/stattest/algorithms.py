@@ -4,8 +4,7 @@ import numpy as np
 
 
 def noisy_max_v1(Q, eps):
-
-    # add lapalce noise
+    # add laplace noise
     noisy_array = [a + np.random.laplace(scale=2.0 / eps) for a in Q]
 
     # find the largest noisy element and return its index
@@ -13,29 +12,17 @@ def noisy_max_v1(Q, eps):
 
 
 def noisy_max_v2(Q, eps):
-
-    # add lapalce noise
     noisy_array = [a + np.random.laplace(scale=2.0 / eps) for a in Q]
-
-    # find the largest noisy element and return the its value
     return max(noisy_array)
 
 
 def noisy_max_v3(Q, eps):
-
-    # add exponential noise
     noisy_array = [a + np.random.exponential(scale=2.0 / eps) for a in Q]
-
-    # find the largest noisy element and return its index
     return np.argmax(noisy_array)
 
 
 def noisy_max_v4(Q, eps):
-
-    # add exponential noise
     noisy_array = [a + np.random.exponential(scale=2.0 / eps) for a in Q]
-
-    # find the largest noisy element and return its value
     return max(noisy_array)
 
 
