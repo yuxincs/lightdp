@@ -4,6 +4,7 @@ import math
 import codecs
 import os
 
+
 def _core_hypothesis_test(algorithm, args, kwargs, D1, D2, S, epsilon, iterations):
     # TODO: to remove manual assertions, we should analyze the code and auto-generate the assertions
     # check if input queries are valid
