@@ -3,7 +3,7 @@
 import numpy as np
 
 
-def noisy_max_v1(Q, eps):
+def noisy_max_v1a(Q, eps):
     # add laplace noise
     noisy_array = [a + np.random.laplace(scale=2.0 / eps) for a in Q]
 
@@ -11,17 +11,17 @@ def noisy_max_v1(Q, eps):
     return np.argmax(noisy_array)
 
 
-def noisy_max_v2(Q, eps):
+def noisy_max_v1b(Q, eps):
     noisy_array = [a + np.random.laplace(scale=2.0 / eps) for a in Q]
     return max(noisy_array)
 
 
-def noisy_max_v3(Q, eps):
+def noisy_max_v2a(Q, eps):
     noisy_array = [a + np.random.exponential(scale=2.0 / eps) for a in Q]
     return np.argmax(noisy_array)
 
 
-def noisy_max_v4(Q, eps):
+def noisy_max_v2b(Q, eps):
     noisy_array = [a + np.random.exponential(scale=2.0 / eps) for a in Q]
     return max(noisy_array)
 
