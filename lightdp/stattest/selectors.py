@@ -60,7 +60,7 @@ def sd_s_selector(algorithm, args, kwargs, D1, D2, iterations=1000):
     return [maxi]
 
 
-def fisher_s_selector(algorithm, args, kwargs, D1, D2, iterations=1000, search_space=[]):
+def fisher_s_selector(algorithm, args, kwargs, D1, D2, iterations=100000, search_space=[]):
     assert isfunction(algorithm)
     a = [algorithm(D1, *args, **kwargs) for _ in range(iterations)]
     b = [algorithm(D2, *args, **kwargs) for _ in range(iterations)]
