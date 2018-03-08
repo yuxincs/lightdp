@@ -22,11 +22,8 @@ def _test(cx, cy, epsilon, iterations):
 
 
 def _run_algorithm(algorithm, args, kwargs, D1, D2, S, iterations):
-    cx, cy = 0, 0
-
-    for _ in range(iterations):
-        cx += 1 if algorithm(D1, *args, **kwargs) in S else 0
-        cy += 1 if algorithm(D2, *args, **kwargs) in S else 0
+    cx = sum(1 for _ in range(iterations) if algorithm(D1, *args, **kwargs) in S)
+    cy = sum(1 for _ in range(iterations) if algorithm(D2, *args, **kwargs) in S)
 
     return cx, cy
 
