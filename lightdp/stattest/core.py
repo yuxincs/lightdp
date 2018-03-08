@@ -6,7 +6,7 @@ import os
 from scipy import stats
 
 
-def _test(cx, cy, epsilon, iterations):
+def test_statistics(cx, cy, epsilon, iterations):
     """ old test method
     counter = 0
     for i in range(iterations):
@@ -66,7 +66,7 @@ def hypothesis_test(algorithm, args, kwargs, D1, D2, S, epsilon, iterations, cor
     if cores == 1:
         cx, cy = _run_algorithm(algorithm, args, kwargs, D1, D2, S, iterations)
         cx, cy = (cx, cy) if cx > cy else (cy, cx)
-        return _test(cx, cy, epsilon, iterations), _test(cy, cx, epsilon, iterations)
+        return test_statistics(cx, cy, epsilon, iterations), test_statistics(cy, cx, epsilon, iterations)
     else:
         process_count = mp.cpu_count() if cores == 0 else cores
 
@@ -78,4 +78,4 @@ def hypothesis_test(algorithm, args, kwargs, D1, D2, S, epsilon, iterations, cor
             cy += process_cy
 
         cx, cy = (cx, cy) if cx > cy else (cy, cx)
-        return _test(cx, cy, epsilon, iterations), _test(cy, cx, epsilon, iterations)
+        return test_statistics(cx, cy, epsilon, iterations), test_statistics(cy, cx, epsilon, iterations)
