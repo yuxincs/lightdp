@@ -1,5 +1,5 @@
 from lightdp.stattest import hypothesis_test, generate_inputs, fisher_s_selector, difference_s_selector
-from lightdp.stattest.algorithms import noisy_max_v1, sparse_vector
+from lightdp.stattest.algorithms import *
 from interval import interval, inf, imath
 
 
@@ -13,7 +13,7 @@ def main():
     D2 = [11.04783, 10.10206, 10.85322, 10.04784, 10.04784, 10.40406, 10.04784, 9.664679999999999, 9.660929999999999, 10.06784]
 
     algorithm_epsilon = 1
-    algorithm = noisy_max_v1
+    algorithm = noisy_max_v1a
     results = []
 
     for epsilon in [x / 10.0 for x in range(1, 30, 1)]:
