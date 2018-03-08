@@ -35,7 +35,7 @@ def main():
     # print output
     print("\nFinal Result:")
     print("%s" % algorithm.__name__)
-    print("Algorithm epsilon: %f" % algorithm)
+    print("Algorithm epsilon: %f" % algorithm_epsilon)
     print("D1 : %s" % D1)
     print("D2 : %s" % D2)
     print("[%s]" % (",".join(["[%f, %f, %f]\n" % result for result in results])))
