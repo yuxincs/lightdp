@@ -3,9 +3,11 @@ import multiprocessing as mp
 import math
 import codecs
 import os
+from scipy import stats
 
 
 def _test(cx, cy, epsilon, iterations):
+    """ old test method
     counter = 0
     for i in range(iterations):
         r = np.random.binomial(cx, 1.0 / (np.exp(epsilon)))
@@ -14,6 +16,9 @@ def _test(cx, cy, epsilon, iterations):
             counter += 1
 
     return counter
+    """
+    cx_prime = np.random.binomial(cx, 1.0 / (np.exp(epsilon)))
+    return 1 - stats.hypergeom.cdf(cx_prime, 2 * iterations, iterations, cx_prime + cy)
 
 
 def _run_algorithm(algorithm, args, kwargs, D1, D2, S, iterations):
@@ -64,8 +69,7 @@ def hypothesis_test(algorithm, args, kwargs, D1, D2, S, epsilon, iterations, cor
     if cores == 1:
         cx, cy = _run_algorithm(algorithm, args, kwargs, D1, D2, S, iterations)
         cx, cy = (cx, cy) if cx > cy else (cy, cx)
-        return _test(cx, cy, epsilon, iterations) / float(iterations), \
-               _test(cy, cx, epsilon, iterations) / float(iterations)
+        return _test(cx, cy, epsilon, iterations), _test(cy, cx, epsilon, iterations)
     else:
         process_count = mp.cpu_count() if cores == 0 else cores
 
@@ -77,11 +81,4 @@ def hypothesis_test(algorithm, args, kwargs, D1, D2, S, epsilon, iterations, cor
             cy += process_cy
 
         cx, cy = (cx, cy) if cx > cy else (cy, cx)
-
-        result = _multiprocessing_run(_test, (cx, cy, epsilon), iterations, process_count)
-        p1 = sum(result) / float(iterations)
-
-        result = _multiprocessing_run(_test, (cy, cx, epsilon), iterations, process_count)
-        p2 = sum(result) / float(iterations)
-
-        return p1, p2
+        return _test(cx, cy, epsilon, iterations), _test(cy, cx, epsilon, iterations)
