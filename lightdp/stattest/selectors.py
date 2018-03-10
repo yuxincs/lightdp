@@ -1,11 +1,9 @@
 from inspect import isfunction
-from collections import Counter
-from scipy import stats
-import math
 
 
-def frequency_s_selector(algorithm, args, kwargs, D1, D2, iterations=1000):
+def frequency_s_selector(algorithm, args, kwargs, D1, D2, iterations=10000):
     assert isfunction(algorithm)
+    from collections import Counter
     a = [algorithm(D1, *args, **kwargs) for _ in range(iterations)]
     b = [algorithm(D2, *args, **kwargs) for _ in range(iterations)]
 
@@ -14,8 +12,9 @@ def frequency_s_selector(algorithm, args, kwargs, D1, D2, iterations=1000):
     return [countitem[0][0], countitem[1][0]]
 
 
-def difference_s_selector(algorithm, args, kwargs, D1, D2, iterations=1000):
+def difference_s_selector(algorithm, args, kwargs, D1, D2, iterations=10000):
     assert isfunction(algorithm)
+    from collections import Counter
     a = [algorithm(D1, *args, **kwargs) for _ in range(iterations)]
     b = [algorithm(D2, *args, **kwargs) for _ in range(iterations)]
     count_a, count_b = Counter(a), Counter(b)
@@ -34,7 +33,7 @@ def difference_s_selector(algorithm, args, kwargs, D1, D2, iterations=1000):
     return [diff[i][0] for i in range(1)]
 
 
-def sd_s_selector(algorithm, args, kwargs, D1, D2, iterations=1000):
+def sd_s_selector(algorithm, args, kwargs, D1, D2, iterations=10000):
     assert isfunction(algorithm)
     a = [algorithm(D1, *args, **kwargs) for _ in range(iterations)]
     b = [algorithm(D2, *args, **kwargs) for _ in range(iterations)]
@@ -60,7 +59,7 @@ def sd_s_selector(algorithm, args, kwargs, D1, D2, iterations=1000):
     return [maxi]
 
 
-def fisher_s_selector(algorithm, args, kwargs, D1, D2, epsilon, iterations=1000, search_space=[]):
+def fisher_s_selector(algorithm, args, kwargs, D1, D2, epsilon, iterations=10000, search_space=[]):
     assert isfunction(algorithm)
     from .core import test_statistics
 
