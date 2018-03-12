@@ -6,6 +6,19 @@ import os
 from scipy import stats
 
 
+class __HyperGeometric:
+    """
+    Used by test_statistics function to pass hypergeometric function to multiprocessing.Pool().map,
+    which only accepts pickle-able functions or objects.
+    """
+    def __init__(self, cy, iterations):
+        self.__cy = cy
+        self.__iterations = iterations
+
+    def __call__(self, cx):
+        return 1 - stats.hypergeom.cdf(cx, 2 * self.__iterations, self.__iterations, cx + self.__cy)
+
+
 def test_statistics(cx, cy, epsilon, iterations):
     """ old test method
     counter = 0
@@ -17,8 +30,11 @@ def test_statistics(cx, cy, epsilon, iterations):
 
     return counter
     """
-    cx_prime = np.random.binomial(cx, 1.0 / (np.exp(epsilon)))
-    return 1 - stats.hypergeom.cdf(cx_prime, 2 * iterations, iterations, cx_prime + cy)
+
+    # use a multiprocessing.Pool to parallel average p value calculation
+    with mp.Pool(mp.cpu_count()) as pool:
+        return np.mean(pool.map(__HyperGeometric(cy, iterations),
+                                np.random.binomial(cx, 1.0 / (np.exp(epsilon)), 1000), int(1000 / mp.cpu_count())))
 
 
 def _run_algorithm(algorithm, args, kwargs, D1, D2, S, iterations):
