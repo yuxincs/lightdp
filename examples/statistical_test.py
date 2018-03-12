@@ -37,28 +37,24 @@ def main():
     D2 = [1 for _ in range(5)]
 
     # manual data for noisymax version 1b and 2b
-    D1 = [2 for _ in range(5)]
-    D2 = [1 for _ in range(5)]
+    #D1 = [2 for _ in range(5)]
+    #D2 = [1 for _ in range(5)]
 
     algorithm_epsilon = 1
     algorithm = noisy_max_v1a
     results = []
 
-    for epsilon in [x / 10.0 for x in range(1, 30, 1)]:
+    for epsilon in [x / 10.0 for x in range(7, 30, 1)]:
         # algorithm's fixed privacy budget
         kwargs = {'eps': algorithm_epsilon}
 
         # call s selector to find s
-        S = fisher_s_selector(algorithm, (), kwargs, D1, D2, epsilon, search_space=[[i] for i in range(10)])
+        S = fisher_s_selector(algorithm, (), kwargs, D1, D2, epsilon, search_space=[[i] for i in range(5)])
 
-        # run 5 times and output average p value
-        avg_p1, avg_p2 = 0.0, 0.0
-        for _ in range(5):
-            p1, p2 = hypothesis_test(algorithm, (), kwargs, D1, D2, S, epsilon, 10000, cores=1)
-            avg_p1 += p1
-            avg_p2 += p2
-        results.append((epsilon, avg_p1 / 5, avg_p2 / 5))
-        print("epsilon: %f, p1 = %f, p2 = %f | S = %s" % (epsilon, avg_p1 / 5, avg_p2 / 5, S))
+        p1, p2 = hypothesis_test(algorithm, (), kwargs, D1, D2, S, epsilon, 10000, cores=0)
+
+        results.append((epsilon, p1, p2))
+        print("epsilon: %f, p1 = %f, p2 = %f | S = %s" % (epsilon, p1, p2, S))
 
     # print output
     print("\nFinal Result:")
