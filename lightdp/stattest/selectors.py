@@ -73,6 +73,8 @@ def fisher_s_selector(algorithm, args, kwargs, D1, D2, epsilon, iterations=10000
         cy = sum(1 for y in b if y in s)
         cx, cy = (cx, cy) if cx > cy else (cy, cx)
         new_p = test_statistics(cx, cy, epsilon, iterations)
+        import math
+        print('S: %s p: %f cx: %d cy: %d ratio: %f' % (s, new_p, cx, cy, float(cy) / cx if cx != 0 else math.inf))
         p, s_chosen = (new_p, s) if new_p < p and cx + cy > 0.001 * iterations else (p, s_chosen)
         #print(p, s_chosen)
     return s_chosen
