@@ -5,6 +5,9 @@ import codecs
 import os
 from scipy import stats
 
+# global process pool
+_process_pool = mp.Pool(mp.cpu_count())
+
 
 class __HyperGeometric:
     """
@@ -30,11 +33,10 @@ def test_statistics(cx, cy, epsilon, iterations):
 
     return counter
     """
-
+    global _process_pool
     # use a multiprocessing.Pool to parallel average p value calculation
-    with mp.Pool(mp.cpu_count()) as pool:
-        return np.mean(pool.map(__HyperGeometric(cy, iterations),
-                                np.random.binomial(cx, 1.0 / (np.exp(epsilon)), 1000), int(1000 / mp.cpu_count())))
+    return np.mean(_process_pool.map(__HyperGeometric(cy, iterations),
+                                     np.random.binomial(cx, 1.0 / (np.exp(epsilon)), 1000), int(1000 / mp.cpu_count())))
 
 
 def _run_algorithm(algorithm, args, kwargs, D1, D2, S, iterations):
