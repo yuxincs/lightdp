@@ -67,12 +67,12 @@ def fisher_s_selector(algorithm, args, kwargs, D1, D2, epsilon, iterations=10000
     b = [algorithm(D2, *args, **kwargs) for _ in range(iterations)]
 
     # find S which has minimum p value from search space
-    p, s_chosen = 1, search_space[0]
+    p, s_chosen = 1.0, search_space[0]
     for s in search_space:
         cx = sum(1 for x in a if x in s)
         cy = sum(1 for y in b if y in s)
         cx, cy = (cx, cy) if cx > cy else (cy, cx)
         new_p = test_statistics(cx, cy, epsilon, iterations)
-        p, s_chosen = (new_p, s) if new_p < p and cx > 0.1 * iterations and cy > 0.1 * iterations else (p, s_chosen)
-
+        p, s_chosen = (new_p, s) if new_p < p and cx + cy > 0.001 * iterations else (p, s_chosen)
+        #print(p, s_chosen)
     return s_chosen
