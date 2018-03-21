@@ -1,4 +1,5 @@
 from inspect import isfunction
+import multiprocessing as mp
 
 
 def frequency_s_selector(algorithm, args, kwargs, D1, D2, iterations=10000):
@@ -59,20 +60,43 @@ def sd_s_selector(algorithm, args, kwargs, D1, D2, iterations=10000):
     return [maxi]
 
 
-def fisher_s_selector(algorithm, args, kwargs, D1, D2, epsilon, iterations=10000, search_space=[]):
+class __EvaluateS:
+    def __init__(self, a, b, epsilon, iterations):
+        self.a = a
+        self.b = b
+        self.epsilon = epsilon
+        self.iterations = iterations
+
+    def __call__(self, s):
+        cx = sum(1 for x in self.a if x in s)
+        cy = sum(1 for y in self.b if y in s)
+        cx, cy = (cx, cy) if cx > cy else (cy, cx)
+        return cx, cy
+
+
+_process_pool = mp.Pool(mp.cpu_count())
+
+
+def fisher_s_selector(algorithm, args, kwargs, D1, D2, epsilon, iterations=10000, search_space=()):
     assert isfunction(algorithm)
     from .core import test_statistics
 
     a = [algorithm(D1, *args, **kwargs) for _ in range(iterations)]
     b = [algorithm(D2, *args, **kwargs) for _ in range(iterations)]
 
-    # find S which has minimum p value from search space
-    p, s_chosen = 1, search_space[0]
-    for s in search_space:
-        cx = sum(1 for x in a if x in s)
-        cy = sum(1 for y in b if y in s)
-        cx, cy = (cx, cy) if cx > cy else (cy, cx)
-        new_p = test_statistics(cx, cy, epsilon, iterations)
-        p, s_chosen = (new_p, s) if new_p < p else (p, s_chosen)
+    global _process_pool
 
-    return s_chosen
+    import math
+    import numpy as np
+    # find S which has minimum p value from search space
+    threshold = 0.001 * iterations * np.exp(epsilon)
+    results = _process_pool.map(__EvaluateS(a, b, epsilon, iterations), search_space)
+    p_values = [test_statistics(x[0], x[1], epsilon, iterations)
+                if x[0] + x[1] > threshold else math.inf for x in results]
+
+    # TODO: this should be removed once we don't need to print the information
+    for i, (s, (cx, cy), p) in enumerate(zip(search_space, results, p_values)):
+        print('S: %s p: %f cx: %d cy: %d ratio: %f' % (s, p, cx, cy, float(cy) / cx if cx != 0 else math.inf))
+
+    from numpy import argmin
+    return search_space[argmin(p_values)]
