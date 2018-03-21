@@ -87,10 +87,12 @@ def fisher_s_selector(algorithm, args, kwargs, D1, D2, epsilon, iterations=10000
     global _process_pool
 
     import math
+    import numpy as np
     # find S which has minimum p value from search space
+    threshold = 0.001 * iterations * np.exp(epsilon)
     results = _process_pool.map(__EvaluateS(a, b, epsilon, iterations), search_space)
     p_values = [test_statistics(x[0], x[1], epsilon, iterations)
-                if x[0] + x[1] > 0.001 * iterations else math.inf for x in results]
+                if x[0] + x[1] > threshold else math.inf for x in results]
 
     # TODO: this should be removed once we don't need to print the information
     for i, (s, (cx, cy), p) in enumerate(zip(search_space, results, p_values)):
