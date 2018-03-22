@@ -4,9 +4,9 @@ from lightdp.typing import *
 from lightdp.verifier import NodeVerifier
 
 
-class InputGenerator(NodeVerifier):
+class _SymbolicInputGenerator(NodeVerifier):
     def __init__(self, args):
-        super(InputGenerator, self).__init__()
+        super(_SymbolicInputGenerator, self).__init__()
         assert isinstance(args, dict)
         self._args = args
         self._db_var = None
@@ -100,7 +100,7 @@ class InputGenerator(NodeVerifier):
             return (self.visit(node.value)[0],
                     self.visit(node.value)[1])
         else:
-            return super(InputGenerator, self).visit_Subscript(node)
+            return super(_SymbolicInputGenerator, self).visit_Subscript(node)
 
     def visit_If(self, node):
         test_node = self.visit(node.test)
@@ -116,7 +116,7 @@ class InputGenerator(NodeVerifier):
             z3.If(test_node[1], self.visit(node.body)[1], self.visit(node.orelse)[1])
 
 
-def generate_inputs(tree, args, num_input, fixed_d1=[]):
+def symbolic_generator(tree, args, num_input, fixed_d1=[]):
     """
     :param tree: The algorithm's AST tree
     :param args: The argument to be put in the algorithm
@@ -128,7 +128,7 @@ def generate_inputs(tree, args, num_input, fixed_d1=[]):
     assert isinstance(tree, _ast.AST)
     assert len(fixed_d1) == 0 or num_input == len(fixed_d1), "num_input and len(fixed_d1) must match"
 
-    generator = InputGenerator(args)
+    generator = _SymbolicInputGenerator(args)
     generator.visit(tree)
     constraint, checks, not_checks, db_var, db_distance_var, loop_dependent_vars = generator.get_constraint()
 
