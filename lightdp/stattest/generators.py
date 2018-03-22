@@ -160,3 +160,17 @@ def symbolic_generator(tree, args, num_input, fixed_d1=[]):
     print(d1, d2)
     return d1, d2
 
+
+def simple_generator(algorithm, args, kwargs, num_input):
+    """
+    :param algorithm: The algorithm to run.
+    :param args: The argument for the algorithm.
+    :param kwargs: The keyword argument for the algorithm.
+    :param num_input: The number of inputs to be generated
+    :return: Database (d1, d2)
+    """
+    from .core import hypothesis_test
+    from .selectors import fisher_s_selector
+    d1, d2 = [], []
+
+    return d1, d2
