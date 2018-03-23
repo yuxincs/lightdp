@@ -32,3 +32,6 @@ _pycache_/
 
 # Z3 library release files
 z3/
+
+# Output figure
+*.pdf
