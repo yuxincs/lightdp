@@ -78,9 +78,9 @@ def empi_eval(algorithm, args, kwargs, D1, D2, S, epsilon, iterations):
                 counter+=1
             if counter>=3:
                 eps2=p1
-            if eps1!=0 and eps2!=0:
                 result.append((eps2-eps1)*c/eps1)
                 break
+
     return database(np.argmin(result))
 
 
