@@ -1,6 +1,7 @@
 import numpy as np
 import math
-import selectors
+from selectors import fisher_s_selector
+from core import hypothesis_test
 
 def database_gene(maxlen=8):
     """
@@ -56,18 +57,31 @@ def database_gene(maxlen=8):
 
     return database
 
-
-
-
-
-
-if __name__=='__main__':
-    print(database_gene())
-
-
-
-
-
+def empi_eval(algorithm, args, kwargs, D1, D2, S, epsilon, iterations):
+    algo_eps=1
+    database=database_gene()
+    result=[]
+    c=1
+    for comb in database:
+        D1=comb[0]
+        D2=comb[1]
+        eps1, eps2, counter = 0
+        for test_eps in np.arange(0.2,algo_eps+0.5,0.1):
+            # TODO: need modification
+            S=fisher_s_selector(algorithm, (), kwargs, D1, D2, epsilon,
+                                           search_space=[[i] for i in range(5)])
+            kwargs = {'eps': test_eps}
+            p1,p2=hypothesis_test(algorithm, args, kwargs, D1, D2, S, epsilon, iterations)
+            if p1!=0 and eps1==0:
+                eps1=p1
+            if p1>0.98:
+                counter+=1
+            if counter>=3:
+                eps2=p1
+            if eps1!=0 and eps2!=0:
+                result.append((eps2-eps1)*c/eps1)
+                break
+    return database(np.argmin(result))
 
 
 
