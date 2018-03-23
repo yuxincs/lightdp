@@ -62,9 +62,9 @@ def empi_eval(algorithm, args, kwargs, D1, D2, S, epsilon, iterations):
     database=database_gene()
     result=[]
     c=1
-    for comb in database:
-        D1=comb[0]
-        D2=comb[1]
+    for comb in range(len(database)):
+        D1=database[comb][0]
+        D2=database[comb][1]
         eps1, eps2, counter = 0
         for test_eps in np.arange(0.2,algo_eps+0.5,0.1):
             # TODO: need modification
@@ -80,8 +80,10 @@ def empi_eval(algorithm, args, kwargs, D1, D2, S, epsilon, iterations):
                 eps2=p1
                 result.append((eps2-eps1)*c/eps1)
                 break
+        if len(result)!=comb:
+            result.append(0)
 
-    return database(np.argmin(result))
+    return database[np.argmin(result)]
 
 
 
