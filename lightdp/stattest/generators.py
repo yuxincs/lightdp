@@ -193,32 +193,30 @@ def simple_generator(algorithm, args, kwargs, num_input, search_space):
     results = []
 
     for d1, d2 in candidates:
-        kwargs['eps'] = algorithm_epsilon
+        candidate_result = []
+        for algorithm_epsilon in [0.2, 0.5, 0.7, 1, 2]:
+            kwargs['eps'] = algorithm_epsilon
 
-        rising_epsilon = -math.inf
-        steady_epsilon = math.inf
-        previous_p = [0.0, 0.0]
-        for test_epsilon in np.arange(max(algorithm_epsilon - 0.5, 0.1), algorithm_epsilon + 2.0, 0.1):
-            s = fisher_s_selector(algorithm, args, kwargs, d1, d2, test_epsilon, search_space=search_space)
-            p1, p2 = hypothesis_test(algorithm, args, kwargs, d1, d2, s, test_epsilon, iterations=100000, cores=0)
+            rising_epsilon = 0.1
+            steady_epsilon = algorithm_epsilon + 2.0
+            previous_p = [0.0, 0.0]
+            for test_epsilon in np.arange(max(algorithm_epsilon - 0.5, 0.1), algorithm_epsilon + 2.0, 0.1):
+                s = fisher_s_selector(algorithm, args, kwargs, d1, d2, test_epsilon, search_space=search_space)
+                p1, p2 = hypothesis_test(algorithm, args, kwargs, d1, d2, s, test_epsilon, iterations=100000, cores=0)
 
-            rising_epsilon = test_epsilon if p1 < 0.05 and previous_p < [0.05, 0.05] else rising_epsilon
+                rising_epsilon = test_epsilon if p1 < 0.05 and previous_p < [0.05, 0.05] else rising_epsilon
 
-            steady_epsilon = test_epsilon if p1 > 0.95 and previous_p > [0.95, 0.95] else steady_epsilon
+                steady_epsilon = test_epsilon if p1 > 0.95 and previous_p > [0.95, 0.95] else steady_epsilon
 
-            # store the new p into the history
-            previous_p[0], previous_p[1] = previous_p[1], previous_p[0]
-            previous_p[0] = p1
+                # store the new p into the history
+                previous_p[0], previous_p[1] = previous_p[1], previous_p[0]
+                previous_p[0] = p1
 
-            # stop early for best performance
-            if rising_epsilon > -math.inf and steady_epsilon < math.inf:
-                break
-
-        # prevent inserting 'nan'
-        if rising_epsilon == -math.inf or steady_epsilon == math.inf:
-            results.append(math.inf)
-        else:
-            results.append((steady_epsilon - rising_epsilon) * 1.0 / rising_epsilon)
+                # stop early for best performance
+                if rising_epsilon > 0.1 and steady_epsilon < 10:
+                    break
+            candidate_result.append(rising_epsilon / algorithm_epsilon + 1.0 / (steady_epsilon - rising_epsilon))
+        results.append(np.mean(candidate_result))
 
 
-    return candidates[np.argmin(results)]
+    return candidates[np.argmax(results)]
