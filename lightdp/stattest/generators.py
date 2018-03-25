@@ -175,7 +175,6 @@ def simple_generator(algorithm, args, kwargs, num_input, search_space):
     from .core import hypothesis_test
     from .selectors import fisher_s_selector
     import numpy as np
-    import math
     # assume maximum distance is 1
     d1 = [1 for _ in range(num_input)]
     candidates = [
@@ -215,6 +214,5 @@ def simple_generator(algorithm, args, kwargs, num_input, search_space):
                     break
             candidate_result.append(rising_epsilon / algorithm_epsilon + 1.0 / (steady_epsilon - rising_epsilon))
         results.append(np.mean(candidate_result))
-
 
     return candidates[np.argmax(results)]
