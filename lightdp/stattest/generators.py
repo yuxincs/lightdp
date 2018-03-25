@@ -188,8 +188,6 @@ def simple_generator(algorithm, args, kwargs, num_input, search_space):
         (d1, [0 for _ in range(num_input)]),  # all below
     ]
 
-    # TODO: maybe we should test many algorithm epsilon and average
-    algorithm_epsilon = 1
     results = []
 
     for d1, d2 in candidates:
