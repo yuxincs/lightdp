@@ -1,4 +1,4 @@
-from lightdp.stattest import hypothesis_test, generate_inputs, fisher_s_selector, difference_s_selector
+from lightdp.stattest import hypothesis_test, symbolic_generator, fisher_s_selector, difference_s_selector
 from lightdp.stattest.algorithms import *
 from interval import interval, inf, imath
 
