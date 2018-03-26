@@ -1,5 +1,6 @@
 from inspect import isfunction
 import multiprocessing as mp
+import numpy as np
 
 
 def frequency_s_selector(algorithm, args, kwargs, D1, D2, iterations=10000):
@@ -77,20 +78,22 @@ class __EvaluateS:
 _process_pool = mp.Pool(mp.cpu_count())
 
 
-def fisher_s_selector(algorithm, args, kwargs, D1, D2, epsilon, iterations=10000, search_space=()):
+def fisher_s_selector(algorithm, args, kwargs, D1, D2, epsilon, iterations=10000, search_space=(), cores=1):
     assert isfunction(algorithm)
     from .core import test_statistics
+    import math
 
     a = [algorithm(D1, *args, **kwargs) for _ in range(iterations)]
     b = [algorithm(D2, *args, **kwargs) for _ in range(iterations)]
 
     global _process_pool
 
-    import math
-    import numpy as np
     # find S which has minimum p value from search space
     threshold = 0.001 * iterations * np.exp(epsilon)
-    results = _process_pool.map(__EvaluateS(a, b, epsilon, iterations), search_space)
+
+    results = list(map(__EvaluateS(a, b, epsilon, iterations), search_space)) if cores == 1 \
+        else _process_pool.map(__EvaluateS(a, b, epsilon, iterations), search_space)
+
     p_values = [test_statistics(x[0], x[1], epsilon, iterations)
                 if x[0] + x[1] > threshold else math.inf for x in results]
 
@@ -98,5 +101,4 @@ def fisher_s_selector(algorithm, args, kwargs, D1, D2, epsilon, iterations=10000
     for i, (s, (cx, cy), p) in enumerate(zip(search_space, results, p_values)):
         print('S: %s p: %f cx: %d cy: %d ratio: %f' % (s, p, cx, cy, float(cy) / cx if cx != 0 else math.inf))
 
-    from numpy import argmin
-    return search_space[argmin(p_values)]
+    return search_space[np.argmin(p_values)]
