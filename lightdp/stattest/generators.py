@@ -191,7 +191,7 @@ def simple_generator(algorithm, args, kwargs, num_input, search_space):
 
     for d1, d2 in candidates:
         candidate_result = []
-        for algorithm_epsilon in [0.2, 0.5, 0.7, 1, 2]:
+        for algorithm_epsilon in [0.2, 0.5, 0.7, 1, 2, 3]:
             kwargs['eps'] = algorithm_epsilon
 
             rising_epsilon = 0.1
@@ -210,9 +210,9 @@ def simple_generator(algorithm, args, kwargs, num_input, search_space):
                 previous_p[0] = p1
 
                 # stop early for best performance
-                if rising_epsilon > 0.1 and steady_epsilon < algorithm_epsilon + 2.0:
+                if steady_epsilon < algorithm_epsilon + 2.0:
                     break
-            candidate_result.append(rising_epsilon / algorithm_epsilon + 1.0 / (steady_epsilon - rising_epsilon))
+            candidate_result.append(rising_epsilon - algorithm_epsilon - (steady_epsilon - rising_epsilon))
         results.append(np.mean(candidate_result))
 
     return candidates[np.argmax(results)]
