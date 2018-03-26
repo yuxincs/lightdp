@@ -63,7 +63,7 @@ def test_statistics(cx, cy, epsilon, iterations):
                                      np.random.binomial(cx, 1.0 / (np.exp(epsilon)), 1000), int(1000 / mp.cpu_count())))
 
 
-def hypothesis_test(algorithm, args, kwargs, D1, D2, S, epsilon, iterations, cores=1):
+def hypothesis_test(algorithm, args, kwargs, D1, D2, S, epsilon, iterations, cores=0):
     """
     :param algorithm: The algorithm to run on
     :param args: The arguments the algorithm needs
