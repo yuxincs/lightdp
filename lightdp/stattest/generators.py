@@ -191,7 +191,7 @@ def simple_generator(algorithm, args, kwargs, num_input, search_space):
 
     for d1, d2 in candidates:
         candidate_result = []
-        for algorithm_epsilon in [0.2, 0.5, 0.7, 1, 2]:
+        for algorithm_epsilon in [0.2, 0.5, 0.7, 1, 2, 3]:
             kwargs['eps'] = algorithm_epsilon
 
             rising_epsilon = 0.1
