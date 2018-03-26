@@ -212,7 +212,7 @@ def simple_generator(algorithm, args, kwargs, num_input, search_space):
                 # stop early for best performance
                 if steady_epsilon < algorithm_epsilon + 2.0:
                     break
-            candidate_result.append(rising_epsilon / algorithm_epsilon + 1.0 / (steady_epsilon - rising_epsilon))
+            candidate_result.append(rising_epsilon - algorithm_epsilon - (steady_epsilon - rising_epsilon))
         results.append(np.mean(candidate_result))
 
     return candidates[np.argmax(results)]
