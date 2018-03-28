@@ -2,7 +2,6 @@
 
 import numpy as np
 
-
 def noisy_max_v1a(Q, eps):
     # add laplace noise
     noisy_array = [a + np.random.laplace(scale=2.0 / eps) for a in Q]
@@ -68,7 +67,7 @@ def sparse_vector_v2(Q, eps, N, T):
     c1, c2, i = 0, 0, 0
     eta1 = np.random.laplace(scale=2.0 / eps)
     Tbar = T + eta1
-    while i < len(Q) and c1 < N:
+    while i < len(Q):
         eta2 = np.random.laplace(scale=4.0 / eps)
         if Q[i] + eta2 >= Tbar:
             out.append(True)
@@ -81,28 +80,30 @@ def sparse_vector_v2(Q, eps, N, T):
 
 
 def sparse_vector_v3(Q, eps, N, T):
-    out = []
+    N=len(Q)
     c1, c2, i = 0, 0, 0
+    out = []
     eta1 = np.random.laplace(scale=2.0 / eps)
     Tbar = T + eta1
-    while i < len(Q):
+    while i < len(Q) and c1<N:
         eta2 = np.random.laplace(scale=4.0*N / eps)
         if Q[i] + eta2 >= Tbar:
-            out.append(True)
+            out.append(Q[i] + eta2)
             c1 += 1
         else:
             out.append(False)
             c2 += 1
         i += 1
-    return c1
+    return out
 
 
 def sparse_vector_v4(Q, eps, N, T):
-    out = []
+    N=1
     c1, c2, i = 0, 0, 0
+    out = []
     eta1 = np.random.laplace(scale=2.0 / eps)
     Tbar = T + eta1
-    while i < len(Q) and c1 < 1:
+    while i < len(Q) and c1 < N:
         eta2 = np.random.laplace(scale=4.0*N / eps)
         if Q[i] + eta2 >= Tbar:
             out.append(True)
@@ -111,4 +112,4 @@ def sparse_vector_v4(Q, eps, N, T):
             out.append(False)
             c2 += 1
         i += 1
-    return c1
+    return out
