@@ -113,3 +113,109 @@ def sparse_vector_v4(Q, eps, N, T):
             c2 += 1
         i += 1
     return out
+
+
+def svt_v1(Q, eps, N, T):
+    out = []
+    delta = len(Q)
+    eta1 = np.random.laplace(scale=2.0 * delta / eps)
+    noisy_T = T + eta1
+    count = 0
+    for q in Q:
+        eta2 = np.random.laplace(scale=4.0 * N * delta / eps)
+        if (q + eta2) > noisy_T:
+            out.append(True)
+            count += 1
+            if count >= N:
+                break
+        else:
+            out.append(False)
+    hdist = 0
+    for index, value in enumerate(out):
+        if index < len(Q) / 2 and value == False:
+            hdist += 1
+        if index >= len(Q) / 2 and value == True:
+            hdist += 1
+    return hdist
+
+
+def svt_v3(Q, eps, N, T):
+    out = []
+    eta1 = np.random.laplace(scale=2.0 / eps)
+    noisy_T = T + eta1
+    count = 0
+    for q in Q:
+        eta2 = np.random.laplace(scale=2.0 * N / eps)
+        if q + eta2 > noisy_T:
+            out.append(q+eta2)
+            count += 1
+            if count >= N:
+                break
+        else:
+            out.append(False)
+    return out.count(False)
+
+
+def svt_v4(Q, eps, N, T):
+    out = []
+    delta = 1
+    eta1 = np.random.laplace(scale=4.0 * delta / eps)
+    noisy_T = T + eta1
+    count = 0
+    for q in Q:
+        eta2 = np.random.laplace(scale=(4.0 * delta) / (3.0 * eps))
+        if (q + eta2) > noisy_T:
+            out.append(True)
+            count += 1
+            if count >= N:
+                break
+        else:
+            out.append(False)
+    hdist = 0
+    for index, value in enumerate(out):
+        if index < len(Q) / 2 and value == True:
+            hdist += 1
+        if index >= len(Q) / 2 and value == False:
+            hdist += 1
+    return hdist
+
+
+def svt_v5(Q, eps, N, T):
+    out = []
+    delta = 1
+    eta1 = np.random.laplace(scale=2.0 * delta / eps)
+    noisy_T = T + eta1
+    for q in Q:
+        eta2 = 0
+        if (q + eta2) >= noisy_T:
+            out.append(True)
+        else:
+            out.append(False)
+    hdist = 0
+    for index, value in enumerate(out):
+        if index < len(Q) / 2 and value == True:
+            hdist += 1
+        if index >= len(Q) / 2 and value == False:
+            hdist += 1
+    return hdist
+
+
+
+def svt_v6(Q, eps, N, T):
+    out = []
+    delta = 1
+    eta1 = np.random.laplace(scale=2.0 * delta / eps)
+    noisy_T = T + eta1
+    for q in Q:
+        eta2 = np.random.laplace(scale=2.0 * delta / eps)
+        if (q + eta2) >= noisy_T:
+            out.append(True)
+        else:
+            out.append(False)
+    hdist = 0
+    for index, value in enumerate(out):
+        if index < len(Q) / 2 and value == True:
+            hdist += 1
+        if index >= len(Q) / 2 and value == False:
+            hdist += 1
+    return hdist
