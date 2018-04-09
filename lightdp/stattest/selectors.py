@@ -89,8 +89,7 @@ def fisher_s_selector(algorithm, args, kwargs, D1, D2, epsilon, iterations=10000
     global _process_pool
 
     # find S which has minimum p value from search space
-    #threshold = 0.001 * iterations * np.exp(epsilon)
-    threshold = 0
+    threshold = 0.001 * iterations * np.exp(epsilon)
 
     results = list(map(__EvaluateS(a, b, epsilon, iterations), search_space)) if cores == 1 \
         else _process_pool.map(__EvaluateS(a, b, epsilon, iterations), search_space)
