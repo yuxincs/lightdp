@@ -132,9 +132,9 @@ def svt_v1(Q, eps, N, T):
             out.append(False)
     hdist = 0
     for index, value in enumerate(out):
-        if index < len(Q) / 2 and value == False:
+        if index < len(Q) / 2 and value == True:
             hdist += 1
-        if index >= len(Q) / 2 and value == True:
+        if index >= len(Q) / 2 and value == False:
             hdist += 1
     return hdist
 
