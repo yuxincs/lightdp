@@ -2,6 +2,7 @@
 
 import numpy as np
 
+
 def noisy_max_v1a(Q, eps):
     # add laplace noise
     noisy_array = [a + np.random.laplace(scale=2.0 / eps) for a in Q]
@@ -30,23 +31,7 @@ def histogram(Q, eps):
     return noisy_array[0]
 
 
-def sparse_vector(Q, eps, N, T):
-    out = []
-    eta1 = np.random.laplace(scale=2.0 / eps)
-    Tbar = T + eta1
-    c1, c2, i = 0, 0, 0
-    while i < len(Q):
-        eta2 = np.random.laplace(scale=4 * N / eps)
-        if Q[i] + eta2 >= Tbar:
-            out.append(True)
-            c1 += 1
-        else:
-            out.append(False)
-            c2 += 1
-        i += 1
-    return out
-
-
+"""
 def sparse_vector_v1(Q, eps, N, T):
     out = []
     c1, c2, i = 0, 0, 0
@@ -113,33 +98,27 @@ def sparse_vector_v4(Q, eps, N, T):
             c2 += 1
         i += 1
     return out
+"""
 
 
-def svt_v1(Q, eps, N, T):
+def sparse_vector_lyu(Q, eps, N, T):
     out = []
-    delta = len(Q)
-    eta1 = np.random.laplace(scale=2.0 * delta / eps)
-    noisy_T = T + eta1
-    count = 0
-    for q in Q:
-        eta2 = np.random.laplace(scale=4.0 * N * delta / eps)
-        if (q + eta2) > noisy_T:
+    eta1 = np.random.laplace(scale=2.0 / eps)
+    Tbar = T + eta1
+    c1, c2, i = 0, 0, 0
+    while i < len(Q) and c1 < N:
+        eta2 = np.random.laplace(scale=4 * N / eps)
+        if Q[i] + eta2 >= Tbar:
             out.append(True)
-            count += 1
-            if count >= N:
-                break
+            c1 += 1
         else:
             out.append(False)
-    hdist = 0
-    for index, value in enumerate(out):
-        if index < len(Q) / 2 and value == True:
-            hdist += 1
-        if index >= len(Q) / 2 and value == False:
-            hdist += 1
-    return hdist
+            c2 += 1
+        i += 1
+    return c2
 
 
-def svt_v3(Q, eps, N, T):
+def sparse_vector_roth(Q, eps, N, T):
     out = []
     eta1 = np.random.laplace(scale=2.0 / eps)
     noisy_T = T + eta1
@@ -156,7 +135,7 @@ def svt_v3(Q, eps, N, T):
     return out.count(False)
 
 
-def svt_v4(Q, eps, N, T):
+def sparse_vector_lee(Q, eps, N, T):
     out = []
     delta = 1
     eta1 = np.random.laplace(scale=4.0 * delta / eps)
@@ -180,7 +159,7 @@ def svt_v4(Q, eps, N, T):
     return hdist
 
 
-def svt_v5(Q, eps, N, T):
+def sparse_vector_stoddard(Q, eps, N, T):
     out = []
     delta = 1
     eta1 = np.random.laplace(scale=2.0 * delta / eps)
@@ -200,8 +179,7 @@ def svt_v5(Q, eps, N, T):
     return hdist
 
 
-
-def svt_v6(Q, eps, N, T):
+def sparse_vector_chen(Q, eps, N, T):
     out = []
     delta = 1
     eta1 = np.random.laplace(scale=2.0 * delta / eps)
@@ -220,17 +198,18 @@ def svt_v6(Q, eps, N, T):
             hdist += 1
     return hdist
 
-def chain_mechanism(x,f,eps):
-    """
 
+def chain_mechanism(x, f, eps):
+    """
     :param x: input graph
     :param f: query function?
     :param eps: a list of privacy budgets
     :return: query answer y
     """
-    y=[0]*(len(eps)+1)
-    y[-1]=np.max(f(x[-1])-f(x[-1])+1)+np.random.exponential(scale=np.max([(f(Q)-f(Q)+1) for Q in x])/eps[-1])
-    for i in range(len(eps)-1,0,-1):
-        y[i]=np.max(f(x[i])-f(x[i])+1)+np.random.exponential(scale=y[i+1]/eps[i])
-    y[0]=f(x)+np.random.laplace(scale=y[1]/eps[0])
+    y = [0] * (len(eps) + 1)
+    y[-1] = np.max(f(x[-1]) - f(x[-1]) + 1) + np.random.exponential(
+        scale=np.max([(f(Q) - f(Q) + 1) for Q in x]) / eps[-1])
+    for i in range(len(eps) - 1, 0, -1):
+        y[i] = np.max(f(x[i]) - f(x[i]) + 1) + np.random.exponential(scale=y[i + 1] / eps[i])
+    y[0] = f(x) + np.random.laplace(scale=y[1] / eps[0])
     return y
