@@ -38,3 +38,6 @@ z3/
 
 # Test run file
 run.py
+
+# Result data file
+result_*.json

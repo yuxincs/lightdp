@@ -1,6 +1,9 @@
 from inspect import isfunction
 import multiprocessing as mp
 import numpy as np
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def frequency_s_selector(algorithm, args, kwargs, D1, D2, iterations=10000):
@@ -97,8 +100,7 @@ def fisher_s_selector(algorithm, args, kwargs, D1, D2, epsilon, iterations=10000
     p_values = [test_statistics(x[0], x[1], epsilon, iterations)
                 if x[0] + x[1] > threshold else math.inf for x in results]
 
-    # TODO: this should be removed once we don't need to print the information
     for i, (s, (cx, cy), p) in enumerate(zip(search_space, results, p_values)):
-        print('S: %s p: %f cx: %d cy: %d ratio: %f' % (s, p, cx, cy, float(cy) / cx if cx != 0 else math.inf))
+        logger.debug('S: %s p: %f cx: %d cy: %d ratio: %f' % (s, p, cx, cy, float(cy) / cx if cx != 0 else math.inf))
 
     return search_space[np.argmin(p_values)]
