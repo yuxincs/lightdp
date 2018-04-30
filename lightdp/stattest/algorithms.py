@@ -101,6 +101,21 @@ def sparse_vector_v4(Q, eps, N, T):
 """
 
 
+def sparse_vector_no_threshold_noise(Q, eps, N, T):
+    out = []
+    c1, c2, i = 0, 0, 0
+    while i < len(Q) and c1 < N:
+        eta = np.random.laplace(scale=4.0 * N / eps)
+        if Q[i] + eta >= T:
+            out.append(True)
+            c1 += 1
+        else:
+            out.append(False)
+            c2 += 1
+        i += 1
+    return c2
+
+
 def sparse_vector_lyu(Q, eps, N, T):
     out = []
     eta1 = np.random.laplace(scale=2.0 / eps)
