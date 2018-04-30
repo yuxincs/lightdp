@@ -81,7 +81,7 @@ class __EvaluateS:
 _process_pool = mp.Pool(mp.cpu_count())
 
 
-def fisher_s_selector(algorithm, args, kwargs, D1, D2, epsilon, iterations=10000, search_space=(), cores=0):
+def fisher_s_selector(algorithm, args, kwargs, D1, D2, epsilon, iterations=100000, search_space=(), cores=0):
     assert isfunction(algorithm)
     from .core import test_statistics
     import math
