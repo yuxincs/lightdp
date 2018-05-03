@@ -1,6 +1,7 @@
 import ast
 from lightdp import __doc__
-from lightdp import verifier, transformer
+import lightdp.verifier as verifier
+
 
 def main():
     """
@@ -30,7 +31,7 @@ def main():
         transformed = None
         if not is_sat:
             with open(results.out, 'w') as out:
-                transformed = astunparse.unparse(transformer.transform(tree))
+                transformed = astunparse.unparse(verifier.transform(tree))
                 out.write(transformed)
 
         if results.json_file is not None:

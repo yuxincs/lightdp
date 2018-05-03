@@ -1,7 +1,7 @@
 import ast
 import z3
-from lightdp.typing import *
-from lightdp.verifier import NodeVerifier
+from lightdp.verifier.typing import *
+from lightdp.verifier.core import NodeVerifier
 
 
 class _SymbolicInputGenerator(NodeVerifier):

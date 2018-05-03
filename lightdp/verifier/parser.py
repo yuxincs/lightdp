@@ -3,10 +3,8 @@ def build_parser():
     Build a ply.parser for parsing LightDP annotations.
     :return: ply parser
     """
-    from lightdp.typing import NumType, ListType, BoolType, FunctionType
+    from lightdp.verifier.typing import NumType, ListType, BoolType, FunctionType
     import ply.yacc as yacc
-
-    from lightdp.lexer import tokens
 
     precedence = (
         ('left', 'LIST_TYPE', 'NUM_TYPE', 'BOOL_TYPE', 'TO'),
