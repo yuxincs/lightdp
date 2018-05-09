@@ -41,3 +41,5 @@ run.py
 
 # Result data file
 result_*.json
+debug.txt
+runo.py

@@ -1,6 +1,7 @@
 # TODO: the whole package should be removed in the future since we should have user-input algorithms
 
 import numpy as np
+import math
 
 
 def noisy_max_v1a(Q, eps):
@@ -20,16 +21,41 @@ def noisy_max_v2a(Q, eps):
     noisy_array = [a + np.random.exponential(scale=2.0 / eps) for a in Q]
     return np.argmax(noisy_array)
 
-
 def noisy_max_v2b(Q, eps):
     noisy_array = [a + np.random.exponential(scale=2.0 / eps) for a in Q]
     return max(noisy_array)
 
-
-def histogram(Q, eps):
-    noisy_array = [a + np.random.exponential(scale=1.0 / eps) for a in Q]
+def histogrameps(Q, eps):
+    noisy_array = [a + np.random.laplace(scale=eps) for a in Q]
     return noisy_array[0]
 
+def histogram1_eps(Q, eps):
+    noisy_array = [a + np.random.laplace(scale=1/eps) for a in Q]
+    return noisy_array[0]
+
+def laplace_mechanismq_eps(Q, eps):
+    noisy_array = [a + np.random.laplace(scale=len(Q)/eps) for a in Q]
+    # floor=np.mean(noisy_array)-np.std(noisy_array)/len(Q)
+    # ceiling=np.mean(noisy_array)+np.std(noisy_array)/len(Q)
+    floor=1-0.27
+    ceiling=1+0.75
+    count=0
+    for i in noisy_array:
+        if i>=floor and i <=ceiling:
+            count+=1
+    return count
+
+def laplace_mechanismeps_q(Q, eps):
+    noisy_array = [a + np.random.laplace(scale=eps/len(Q)) for a in Q]
+    # floor=np.mean(noisy_array)-np.std(noisy_array)/len(Q)
+    # ceiling=np.mean(noisy_array)+np.std(noisy_array)/len(Q)
+    floor = 1-0.27
+    ceiling = 1+0.75
+    count = 0
+    for i in noisy_array:
+        if i>=floor and i <=ceiling:
+            count+=1
+    return count
 
 """
 def sparse_vector_v1(Q, eps, N, T):
@@ -228,3 +254,10 @@ def chain_mechanism(x, f, eps):
         y[i] = np.max(f(x[i]) - f(x[i]) + 1) + np.random.exponential(scale=y[i + 1] / eps[i])
     y[0] = f(x) + np.random.laplace(scale=y[1] / eps[0])
     return y
+
+# if __name__=='__main__':
+#     D1=[2]+[1 for _ in range(4)]
+#     D2=[1 for _ in range(5)]
+#     r1=[histogrameps(D1,1.5) for _ in range(100000)]
+#     r2=[histogrameps(D2,1.5) for _ in range(100000)]
+#     print(np.min(r1+r2),np.max(r1+r2))

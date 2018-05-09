@@ -199,7 +199,7 @@ def simple_generator(algorithm, args, kwargs, num_input, search_space):
             previous_p = [0.0, 0.0]
             for test_epsilon in np.arange(max(algorithm_epsilon - 0.5, 0.1), algorithm_epsilon + 2.0, 0.1):
                 s = fisher_s_selector(algorithm, args, kwargs, d1, d2, test_epsilon, search_space=search_space)
-                p1, p2 = hypothesis_test(algorithm, args, kwargs, d1, d2, s, test_epsilon, iterations=100000, cores=0)
+                p1= hypothesis_test(algorithm, args, kwargs, d1, d2, s, test_epsilon, iterations=100000, cores=0)
 
                 rising_epsilon = test_epsilon if p1 < 0.05 and previous_p < [0.05, 0.05] else rising_epsilon
 
