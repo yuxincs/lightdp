@@ -1,3 +1,6 @@
+from .lexer import tokens
+
+
 def build_parser():
     """
     Build a ply.parser for parsing LightDP annotations.
