@@ -43,3 +43,9 @@ run.py
 result_*.json
 debug.txt
 runo.py
+
+# Coverage reports
+.coverage*
+
+# pytest cache
+.pytest_cache
