@@ -1,6 +1,6 @@
 import ast
 from lightdp import __doc__
-import lightdp.verifier as verifier
+from lightdp import verify, transform
 
 
 def main():
@@ -27,11 +27,11 @@ def main():
     # parse / verify / transform the file
     with open(results.file, 'r') as f:
         tree = ast.parse(f.read())
-        is_sat, constraints = verifier.verify(tree)
+        is_sat, constraints = verify(tree)
         transformed = None
         if not is_sat:
             with open(results.out, 'w') as out:
-                transformed = astunparse.unparse(verifier.transform(tree))
+                transformed = astunparse.unparse(transform(tree))
                 out.write(transformed)
 
         if results.json_file is not None:

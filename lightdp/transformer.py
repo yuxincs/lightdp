@@ -72,4 +72,3 @@ def transform(node):
     :return: The transformed :py:class:`ast.AST``
     """
     return NodeTransformer().visit(node)
-

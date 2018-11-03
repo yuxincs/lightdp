@@ -1,7 +1,7 @@
 import ast
 import _ast
 import re
-from lightdp.verifier.typing import *
+from lightdp.typing import *
 try:
     import z3
 except ImportError:

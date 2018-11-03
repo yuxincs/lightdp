@@ -1,4 +1,4 @@
-from .lexer import tokens
+from lightdp.lexer import tokens
 
 
 def build_parser():
