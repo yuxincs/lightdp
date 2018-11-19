@@ -1,5 +1,5 @@
-from lightdp.verifier.lexer import build_lexer
-from lightdp.verifier.parser import build_parser
+from lightdp.lexer import build_lexer
+from lightdp.parser import build_parser
 import jsonpickle
 
 

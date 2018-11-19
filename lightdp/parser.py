@@ -6,7 +6,7 @@ def build_parser():
     Build a ply.parser for parsing LightDP annotations.
     :return: ply parser
     """
-    from lightdp.verifier.typing import NumType, ListType, BoolType, FunctionType
+    from lightdp.typing import NumType, ListType, BoolType, FunctionType
     import ply.yacc as yacc
 
     precedence = (

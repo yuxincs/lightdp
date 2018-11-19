@@ -1,5 +1,5 @@
 import pytest
-from lightdp.verifier.lexer import build_lexer
+from lightdp.lexer import build_lexer
 
 
 def test_precondition():
