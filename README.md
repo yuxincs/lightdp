@@ -1,5 +1,5 @@
 # LightDP
-[![Build Status](https://travis-ci.com/RyanWangGit/lightdp.svg?branch=master)](https://travis-ci.com/RyanWangGit/lightdp)
+[![Build Status](https://travis-ci.com/RyanWangGit/lightdp.svg?branch=master)](https://travis-ci.com/RyanWangGit/lightdp) [![codecov](https://codecov.io/gh/RyanWangGit/lightdp/branch/master/graph/badge.svg)](https://codecov.io/gh/RyanWangGit/lightdp)
 
 A Light-Weight imperative language for developing provably privacy-preserving algorithms.
 More details can be found [here](http://www.cse.psu.edu/~dbz5017/pub/popl17.pdf).
