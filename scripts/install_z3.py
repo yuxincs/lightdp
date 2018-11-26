@@ -5,10 +5,7 @@ import zipfile
 import shutil
 import string
 import random
-try:
-    import urllib.request as urlrequest
-except ImportError:
-    import urllib as urlrequest
+import urllib.request as urlrequest
 
 
 def main():
