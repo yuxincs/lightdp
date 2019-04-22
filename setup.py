@@ -25,7 +25,7 @@ setup(
     ],
     keywords='Programming Language, Differential Privacy',
     packages=find_packages(exclude=['tests']),
-    install_requires=['ply', 'astunparse', 'z3-solver'],
+    install_requires=['ply', 'astunparse', 'z3-solver', 'coloredlogs'],
     extras_require={
         'test': ['pytest-cov', 'pytest', 'coverage', 'jsonpickle'],
     },
