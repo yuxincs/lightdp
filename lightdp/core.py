@@ -2,11 +2,8 @@ import ast
 import _ast
 import re
 from lightdp.typing import *
-try:
-    import z3
-except ImportError:
-    print('Z3 or Z3\'s python binding not installed, use scripts/install_z3.py script to install z3.')
-    exit(1)
+import z3
+
 
 _cmpop_map = {
     ast.Eq: lambda x, y: x == y,
