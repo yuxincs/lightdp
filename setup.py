@@ -1,8 +1,7 @@
 from setuptools import setup, find_packages
-from codecs import open
 
 # Get the long description from the relevant file
-with open('README.md', encoding='utf-8') as f:
+with open('README.md') as f:
     long_description = f.read()
 
 setup(
@@ -26,7 +25,7 @@ setup(
     ],
     keywords='Programming Language, Differential Privacy',
     packages=find_packages(exclude=['tests']),
-    install_requires=['ply', 'numpy', 'scipy', 'astunparse'],
+    install_requires=['ply', 'astunparse'],
     extras_require={
         'test': ['pytest-cov', 'pytest', 'coverage', 'jsonpickle'],
     },
