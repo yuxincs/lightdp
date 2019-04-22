@@ -2,47 +2,33 @@
 [![Build Status](https://travis-ci.com/RyanWangGit/lightdp.svg?branch=master)](https://travis-ci.com/RyanWangGit/lightdp) [![codecov](https://codecov.io/gh/RyanWangGit/lightdp/branch/master/graph/badge.svg)](https://codecov.io/gh/RyanWangGit/lightdp)
 
 A Light-Weight imperative language for developing provably privacy-preserving algorithms.
-More details can be found [here](http://www.cse.psu.edu/~dbz5017/pub/popl17.pdf).
+More details can be found in the [paper](http://www.cse.psu.edu/~dbz5017/pub/popl17.pdf).
 
-This project presents a tool for transforming LightDP programs into Python programs along with differential-privacy proofs.
+This project presents a tool for transforming LightDP programs into Python programs along with differential-privacy proofs, it is built to learn the ideas of LightDP and very primitive.
 
 # Install
 
-To install it, run
-
+Virtual environment is highly recommended (or if you prefer `virtualenv` or `conda`, the setup is similar):
 ```bash
-$ python setup.py install
+python -m venv venv
+source venv/bin/acitvate
+# now we're in virtual environment
+pip install .
 ```
-
-or use 
-
-```bash
-$ python setup.py develop
-```
-
-for dependencies installation without installing the program into system.
-
-This program needs `z3` and the corresponding python bindings installed in the system, check [z3's webpage](https://github.com/Z3Prover/z3) for installation instructions. 
-
-A simple script `scripts/install_z3.py` is provided for easy installation of `z3`. Which collects the library from the [`z3`'s release page](https://github.com/Z3Prover/z3/releases) and installs at the current directory. An argument can be provided to the script to install the library and python bindings elsewhere, note that this does not install `z3` into the system.
 
 # Usage
 
-The original python program 
-To transform LightDP-annotated program `source.py` to `output.py`, run
-
 ```bash
-$ lightdp source.py -o output.py
+usage: lightdp [-h] [-o OUT] [-c CONSTRAINTS] FILE
+
+positional arguments:
+  FILE
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -o OUT, --out OUT     The output file name.
+  -c CONSTRAINTS, --constraints CONSTRAINTS
+                        Output all constraints to file.
 ```
 
-If `-o` is not given the default output file name is `source_t.py`.
-
-This program can also run as a module like
-
-```bash
-$ python -m lightdp source.ldp -o output.py
-```
-
-# Examples
-
-Examples can be found at `./examples`, currently `sparse_vector.py` and `sparse_vector_t.py` is included.
+For example, run `lightdp ./examples/sparsevector.py` for verifying Sparse Vector. We also put some annotated programs in `examples/` for annotation references. The default name for transformed file and constraint file is `*_t.py` and `*_constraints.txt`.
