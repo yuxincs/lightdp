@@ -42,6 +42,9 @@ z3/
 # pytest cache
 .pytest_cache
 
+# virtual environment
+venv/
+
 # LightDP output files
 *_t.py
 *_constraints.txt
