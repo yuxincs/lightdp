@@ -1,26 +1,21 @@
 language: python
+dist: xenial
 
 python:
-  - "3.4"
   - "3.5"
   - "3.6"
+  - "3.7"
 
 cache: pip
 
 install:
   - pip install tox-travis
-  - python ./scripts/install_z3.py
 
 script:
   - tox
 
-jobs:
-  include:
-    - stage: codecov
-      python: "3.6"
-      script:
-        - tox
-        - pip install codecov && codecov --token=$CODECOV_TOKEN
+after_success:
+  - pip install codecov && codecov
 
 notifications:
   email: false
