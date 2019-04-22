@@ -49,3 +49,7 @@ runo.py
 
 # pytest cache
 .pytest_cache
+
+# LightDP output files
+*_t.py
+*_constraints.txt
