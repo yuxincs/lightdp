@@ -2,6 +2,7 @@ import ast
 import argparse
 import astunparse
 import logging
+import sys
 import os
 import coloredlogs
 from lightdp import __doc__
@@ -11,7 +12,7 @@ coloredlogs.install('INFO', fmt='%(asctime)s %(levelname)s %(message)s')
 logger = logging.getLogger(__name__)
 
 
-def main():
+def main(argv=sys.argv[1:]):
     """
     Main function, parse the program argument and run the program.
     :return: None
@@ -26,7 +27,7 @@ def main():
                             action='store', dest='constraints', type=str,
                             help='Output all constraints to file.', required=False)
 
-    results = arg_parser.parse_args()
+    results = arg_parser.parse_args(argv)
     results.file = results.file[0]
     results.out = results.out if results.out else \
         './{}_t.py'.format(os.path.splitext(os.path.basename(results.file))[0])
@@ -49,6 +50,9 @@ def main():
 
         with open(results.constraints, 'w') as out:
             out.write(constraints)
+
+    # shell code 0 means SUCCESS
+    return 0 if not is_sat else 1
 
 
 if __name__ == '__main__':
