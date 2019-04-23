@@ -5,7 +5,7 @@ with open('README.md') as f:
     long_description = f.read()
 
 setup(
-    name='LightDP',
+    name='lightdp',
     version='0.1',
     description='LightDP - A Light-Weight Imperative Language That Provides Differential Privacy Proofs.',
     long_description=long_description,
