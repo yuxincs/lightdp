@@ -36,4 +36,5 @@ For example, run `lightdp ./examples/sparsevector.py` for verifying Sparse Vecto
 2019-04-23 10:58:35 INFO Type check succeeds, now transforming the algorithm...
 2019-04-23 10:58:35 INFO Transformation finished at ./sparse_vector_t.py. See ./sparse_vector_constraints.txt for constraints generated.
 ```
-. We also put some annotated programs in `examples/` for references. The default name for transformed file and constraint file is `*_t.py` and `*_constraints.txt`.
+
+We also put some annotated programs in `examples/` for references. The default name for transformed file and constraint file is `*_t.py` and `*_constraints.txt`.
