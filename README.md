@@ -38,3 +38,6 @@ For example, run `lightdp ./examples/sparsevector.py` for verifying Sparse Vecto
 ```
 
 We also put some annotated programs in `examples/` for references. The default name for transformed file and constraint file is `*_t.py` and `*_constraints.txt`.
+
+# License
+[MIT](https://github.com/yxwangcs/lightdp/blob/master/LICENSE).
