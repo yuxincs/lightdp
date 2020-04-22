@@ -26,3 +26,5 @@ jobs:
         run: |
           # remove the "." in the python version
           tox -e "py${PYTHON_VERSION//.}"
+      - name: Upload to codecov
+        uses: codecov/codecov-action@v1
