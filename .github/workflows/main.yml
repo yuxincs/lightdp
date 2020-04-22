@@ -4,7 +4,6 @@ on: [push, pull_request]
 
 jobs:
   build:
-    needs: [lint]
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
