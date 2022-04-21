@@ -1,5 +1,5 @@
 # LightDP
-[![build](https://github.com/yxwangcs/lightdp/workflows/build/badge.svg)](https://github.com/yxwangcs/lightdp/actions?workflow=build) [![codecov](https://codecov.io/gh/yxwangcs/lightdp/branch/master/graph/badge.svg)](https://codecov.io/gh/yxwangcs/lightdp)
+[![build](https://github.com/yuxincs/lightdp/workflows/build/badge.svg)](https://github.com/yuxincs/lightdp/actions?workflow=build) [![codecov](https://codecov.io/gh/yuxincs/lightdp/branch/master/graph/badge.svg)](https://codecov.io/gh/yuxincs/lightdp)
 
 A Light-Weight imperative language for developing provably privacy-preserving algorithms.
 More details can be found in the [paper](http://www.cse.psu.edu/~dbz5017/pub/popl17.pdf).
@@ -40,4 +40,4 @@ For example, run `lightdp ./examples/sparsevector.py` for verifying Sparse Vecto
 We also put some annotated programs in `examples/` for references. The default name for transformed file and constraint file is `*_t.py` and `*_constraints.txt`.
 
 ## License
-[MIT](https://github.com/yxwangcs/lightdp/blob/master/LICENSE).
+[MIT](https://github.com/yuxincs/lightdp/blob/master/LICENSE).
